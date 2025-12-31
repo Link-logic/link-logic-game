@@ -1557,7 +1557,7 @@
                 justifyContent: 'center'
               }}>
                 <img 
-                  src="./logo-small.png"
+                  src="./logo-full.png"
                   alt="Link Logic"
                   style={{
                     width: '100%',
@@ -1567,7 +1567,7 @@
                   onError={(e) => {
                     // Show fallback text if image fails to load
                     e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<div style="color: #7B2CBF; text-align: center; font-size: 24px; font-weight: bold; padding: 20px;">LINK<br/>LOGIC<br/><span style="font-size: 14px; color: white; margin-top: 10px; display: block;">Logo image missing<br/>Add logo-small.png to same folder</span></div>';
+                    e.target.parentElement.innerHTML = '<div style="color: #7B2CBF; text-align: center; font-size: 24px; font-weight: bold; padding: 20px;">LINK<br/>LOGIC<br/><span style="font-size: 14px; color: white; margin-top: 10px; display: block;">Logo image missing<br/>Add logo-full.png to same folder</span></div>';
                   }}
                 />
               </div>
@@ -1671,6 +1671,14 @@
         
         return (
           <div className="min-h-screen p-5 flex items-center justify-center" style={{background: '#000000'}}>
+            <style>{`
+              input[type="text"]::placeholder,
+              input[type="email"]::placeholder,
+              input[type="tel"]::placeholder {
+                color: #666666 !important;
+                opacity: 0.8;
+              }
+            `}</style>
             <div className="max-w-md w-full rounded-xl shadow-2xl p-8 border-4 relative" style={{backgroundColor: '#000000', borderColor: '#7B2CBF'}}>
               
               {/* Small logo in top left */}
@@ -1758,7 +1766,7 @@
                     style={{
                       backgroundColor: '#ECECEC', 
                       border: '3px solid #F88E00',
-                      color: '#C0C0C0',
+                      color: '#000000',
                       fontSize: '16px'
                     }}
                     maxLength={20}
