@@ -553,7 +553,6 @@
       const [selectedPreset, setSelectedPreset] = useState(4); // Default to Preset 4 (medium)
       const [isEditingPreset, setIsEditingPreset] = useState(false);
       const [customPresetSettings, setCustomPresetSettings] = useState(null);
-      const [presetsConfirmed, setPresetsConfirmed] = useState(false); // Track if host confirmed presets
       
       // Sound effects using Web Audio API
       const playSound = (type) => {
@@ -2017,29 +2016,6 @@
                 
                 <div>
                   <h2 className="text-5xl font-bold mb-2" style={{color: '#7B2CBF'}}>❓ Challenges</h2>
-                  <p>Think someone's link doesn't work? Challenge it! Other players vote to accept or reject.</p>
-                </div>
-                
-                <div>
-                  <h2 className="text-5xl font-bold mb-2" style={{color: '#7B2CBF'}}>🔄 Reconnecting</h2>
-                  <p>If you get disconnected during a game, check your invitation text for the <strong>Game Room</strong> link to rejoin quickly!</p>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => setScreen('welcome')}
-                className="w-full py-4 rounded-lg font-bold text-5xl mt-6 transition shadow-lg hover:shadow-xl"
-                style={{background: 'linear-gradient(180deg, #7B2CBF 0%, #7B2CBF 50%, #7b1fa2 100%)', color: '#ffffff'}}
-              >
-                BACK TO MENU
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      // Practice Mode Setup Screen
-
       if (screen === 'lobby' && gameData?.gameState === 'lobby') {
         return (
           <div className="min-h-screen p-5 flex items-center justify-center" style={{background: '#000000'}}>
@@ -2150,8 +2126,8 @@
                   </div>
                 </div>
 
-                {/* Preset Selection - Only show for host and when presets NOT confirmed */}
-                {isHost && !presetsConfirmed && (
+                {/* Preset Selection - Only show for host */}
+                {isHost && (
                   <>
                     <div style={{color: '#FFFFFF', fontSize: '24px', fontWeight: 'bold', marginBottom: '15px', textAlign: 'center'}}>
                       Select Difficulty Level
@@ -2384,9 +2360,9 @@
                       </button>
                     </div>
                     
-                    {/* Let's Play Button - Confirms presets and shows Host Room */}
+                    {/* Let's Play Button */}
                     <button
-                      onClick={() => setPresetsConfirmed(true)}
+                      onClick={startGame}
                       disabled={players.length < 1}
                       style={{
                         width: '100%',
@@ -2405,65 +2381,6 @@
                       {players.length < 1 ? 'WAITING FOR PLAYERS...' : "Let's Play"}
                     </button>
                   </>
-                )}
-                
-                {/* Host Room - Show after presets are confirmed */}
-                {isHost && presetsConfirmed && (
-                  <div style={{marginTop: '20px'}}>
-                    <div style={{
-                      background: '#FFFFFF',
-                      borderRadius: '15px',
-                      padding: '20px',
-                      marginBottom: '20px',
-                      textAlign: 'center'
-                    }}>
-                      <h3 style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '15px', color: '#000000'}}>
-                        Ready to Start!
-                      </h3>
-                      <p style={{color: '#666666', marginBottom: '10px'}}>
-                        All settings confirmed. When everyone is ready, tap the button below to begin the countdown.
-                      </p>
-                    </div>
-                    
-                    {/* Tap to Play Button - THIS actually starts the game */}
-                    <button
-                      onClick={startGame}
-                      style={{
-                        width: '100%',
-                        padding: '18px',
-                        borderRadius: '12px',
-                        background: '#00BCD4',
-                        border: 'none',
-                        color: '#FFFFFF',
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        marginBottom: '15px'
-                      }}
-                    >
-                      Tap to Play
-                    </button>
-                    
-                    {/* Back button to change presets */}
-                    <button
-                      onClick={() => setPresetsConfirmed(false)}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '10px',
-                        background: 'transparent',
-                        border: '2px solid #FFFFFF',
-                        color: '#FFFFFF',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      Back to Settings
-                    </button>
-                  </div>
                 )}
                 
                 {/* Non-host waiting message */}
