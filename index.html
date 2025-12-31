@@ -10,29 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'dark-cyan': '#00acc1',
-            'dark-cyan-dark': '#00838f',
-            'dark-cyan-light': '#b2ebf2',
-            'honey-yellow': '#ffd54f',
-            'burnt-orange': '#ff6f00',
-            'burnt-orange-dark': '#e65100',
-            'royal-purple': '#7B2CBF',
-            'cerulean': '#2196f3',
-            'cerulean-dark': '#1976d2',
-            'cerulean-light': '#bbdefb',
-            'vermillion': '#f44336',
-            'vermillion-dark': '#d32f2f',
-            'vermillion-light': '#ffcdd2'
-          }
-        }
-      }
-    }
-  </script>
   <style>
     /* Glossy Button Base Style */
     .glossy-btn {
@@ -2041,259 +2018,172 @@
 
       if (screen === 'lobby' && gameData?.gameState === 'lobby') {
         return (
-          <div className="min-h-screen p-5 flex items-center justify-center" style={{background: '#000000'}}>
-            <div className="w-full rounded-3xl shadow-2xl p-8" style={{
-              backgroundColor: '#000000',
-              borderColor: '#8B5CF6',
-              border: '8px solid',
-              maxWidth: '480px',
-              minHeight: '90vh'
-            }}>
+          <div className="min-h-screen p-6" style={{background: 'linear-gradient(135deg, #0a1e3d 0%, #162d50 50%, #1e4d8b 100%)'}}>
+            <div className="max-w-2xl mx-auto">
+              <h1 className="text-5xl font-bold text-center mb-2 text-white">LINK LOGIC</h1>
               
-              {/* Small logo in top left */}
-              <img 
-                src="./logo-small.png" 
-                alt="Link Logic" 
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  left: '20px',
-                  width: '70px',
-                  height: 'auto',
-                  borderRadius: '8px'
-                }}
-              />
-              
-              {/* Page Title */}
-              <h1 className="text-4xl font-bold text-white text-center mb-6">Host Room</h1>
-              
-              {/* Main Content Box - Purple */}
-              <div style={{backgroundColor: '#8B5CF6', borderRadius: '20px', padding: '30px 25px'}}>
-                
-                {/* Room Code Section */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div style={{
-                      background: '#00BCD4',
-                      color: '#FFFFFF',
-                      padding: '10px 15px',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      Room Number:
-                    </div>
-                    <div style={{
-                      background: '#FFFFFF',
-                      padding: '10px 15px',
-                      borderRadius: '8px',
-                      flex: '1',
-                      textAlign: 'center',
-                      color: '#FF9800',
-                      fontSize: '20px',
-                      fontWeight: 'bold',
-                      fontFamily: 'monospace'
-                    }}>
-                      {roomCode}
-                    </div>
+              <div className="rounded-xl shadow-lg p-6 mb-6" style={{backgroundColor: '#2557a0', border: '3px solid #3d6db5'}}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-5xl font-bold text-white">Room Code:</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-5xl font-mono font-bold" style={{color: '#f5b942'}}>{roomCode}</span>
                     <button
                       onClick={copyRoomCode}
-                      style={{
-                        background: '#00BCD4',
-                        color: '#FFFFFF',
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        border: 'none',
-                        fontSize: '24px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
+                      className="p-2 rounded-lg transition"
+                      style={{backgroundColor: '#162d50'}}
                     >
-                      {copied ? '✓' : '📋'}
+                      {copied ? <CheckIcon /> : <CopyIcon />}
                     </button>
                   </div>
-                  <p style={{color: '#FFFFFF', fontSize: '12px', textAlign: 'center'}}>Share this code with friends to join!</p>
                 </div>
+                <p className="text-white opacity-90 text-center">Share this code with friends to join!</p>
+              </div>
 
-                {/* Players Section */}
-                <div style={{
-                  background: '#FFFFFF',
-                  border: '3px solid #000000',
-                  borderRadius: '15px',
-                  padding: '20px',
-                  marginBottom: '20px'
-                }}>
-                  <h3 style={{fontSize: '20px', fontWeight: 'bold', textAlign: 'center', marginBottom: '15px', color: '#000000'}}>
-                    Players ({players.length})
-                  </h3>
-                  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
-                    {players.map(p => (
-                      <div key={p.id} style={{
-                        background: '#FFFFFF',
-                        border: '3px solid #8B5CF6',
-                        borderRadius: '10px',
-                        padding: '12px',
-                        textAlign: 'center',
-                        color: p.id === playerId ? '#000000' : '#666666',
-                        fontSize: '14px',
-                        fontWeight: p.id === playerId ? 'bold' : 'normal'
-                      }}>
-                        {p.name}
-                        {p.isHost && <span style={{display: 'block', fontSize: '10px', color: '#FF9800'}}>HOST</span>}
-                      </div>
-                    ))}
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <UsersIcon />
+                  <h3 className="text-5xl font-bold">Players ({players.length})</h3>
+                </div>
+                <div className="space-y-2">
+                  {players.map(p => (
+                    <div key={p.id} className={`${p.id === playerId ? 'bg-blue-100 border-blue-400' : 'bg-gray-50 border-gray-200'} border-2 rounded-lg p-3 flex justify-between items-center`}>
+                      <span className="font-semibold">{p.name}</span>
+                      {p.isHost && <span className="bg-burnt-orange text-white px-2 py-1 rounded text-sm">HOST</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {isHost && (
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                  <h3 className="text-5xl font-bold mb-4">Select Difficulty Preset</h3>
+                  
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    {[1,2,3,4,5,6,7,8,9].map(presetNum => {
+                      const preset = PRESETS[presetNum];
+                      const isSelected = selectedPreset === presetNum;
+                      return (
+                        <button
+                          key={presetNum}
+                          onClick={() => {
+                            setSelectedPreset(presetNum);
+                            // Use custom settings if editing this preset, otherwise use defaults
+                            const settingsToUse = (presetNum === selectedPreset && customPresetSettings) 
+                              ? customPresetSettings 
+                              : preset;
+                            updateConfig({
+                              ...gameData.config,
+                              numWords: settingsToUse.numWords,
+                              roundTimer: settingsToUse.roundTimer,
+                              numRounds: settingsToUse.numRounds,
+                              bonusWords: settingsToUse.bonusWords,
+                              difficulty: preset.difficulty,
+                              presetLevel: presetNum
+                            });
+                          }}
+                          style={{
+                            backgroundColor: preset.color,
+                            borderColor: preset.color,
+                            color: '#fff',
+                            opacity: isSelected ? 1 : 0.95,
+                            fontWeight: isSelected ? 'bold' : 'normal'
+                          }}
+                          className={`border-4 rounded-lg p-3 text-center font-bold transition hover:shadow-lg hover:opacity-100 ${
+                            isSelected ? 'shadow-xl scale-110 ring-4 ring-white' : ''
+                          }`}
+                        >
+                          <div className="text-5xl mb-1">{presetNum}</div>
+                          <div className="text-xs opacity-90">{preset.name}</div>
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
-
-                {/* Preset Selection - Only show for host */}
-                {isHost && (
-                  <>
-                    <div style={{color: '#FFFFFF', fontSize: '24px', fontWeight: 'bold', marginBottom: '15px', textAlign: 'center'}}>
-                      Select Difficulty Level
-                    </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                    <h4 className="font-bold mb-3 text-lg">
+                      Preset {selectedPreset} Settings: <span className="font-normal text-sm">Level: {PRESETS[selectedPreset].description}</span>
+                    </h4>
                     
-                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px'}}>
-                      {[1,2,3,4,5,6,7,8,9].map(presetNum => {
-                        const preset = PRESETS[presetNum];
-                        const isSelected = selectedPreset === presetNum;
-                        return (
-                          <button
-                            key={presetNum}
-                            onClick={() => {
-                              setSelectedPreset(presetNum);
-                              const settingsToUse = (presetNum === selectedPreset && customPresetSettings) 
-                                ? customPresetSettings 
-                                : preset;
-                              updateConfig({
-                                ...gameData.config,
-                                numWords: settingsToUse.numWords,
-                                roundTimer: settingsToUse.roundTimer,
-                                numRounds: settingsToUse.numRounds,
-                                bonusWords: settingsToUse.bonusWords,
-                                difficulty: preset.difficulty,
-                                presetLevel: presetNum
-                              });
-                            }}
-                            style={{
-                              backgroundColor: preset.color,
-                              padding: '20px',
-                              borderRadius: '12px',
-                              border: isSelected ? '4px solid #FFFFFF' : 'none',
-                              fontSize: '16px',
-                              fontWeight: 'bold',
-                              color: '#FFFFFF',
-                              cursor: 'pointer',
-                              textAlign: 'center',
-                              transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            <div style={{fontSize: '24px'}}>Preset</div>
-                            <div style={{fontSize: '32px'}}>{presetNum}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Preset Info Box */}
-                    <div style={{
-                      background: '#FFFFFF',
-                      border: '3px solid #000000',
-                      borderRadius: '15px',
-                      padding: '20px',
-                      marginBottom: '20px',
-                      color: '#000000'
-                    }}>
-                      <h3 style={{fontSize: '18px', marginBottom: '8px', textAlign: 'center', fontWeight: 'bold'}}>
-                        Level {selectedPreset} Preset Settings:
-                      </h3>
-                      <div style={{fontSize: '14px', marginBottom: '15px', textAlign: 'center'}}>
-                        Level: {PRESETS[selectedPreset].description}
+                    {!isEditingPreset ? (
+                      // Display mode
+                      <div className="grid grid-cols-2 gap-3 text-base mb-4">
+                        <div><strong>Words:</strong> {customPresetSettings?.numWords || PRESETS[selectedPreset].numWords}</div>
+                        <div><strong>Timer:</strong> {customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer}s</div>
+                        <div><strong>Rounds:</strong> {customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds}</div>
+                        <div><strong>Bonus Words:</strong> {customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords} ⭐</div>
                       </div>
-                      
-                      {!isEditingPreset ? (
-                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '15px'}}>
-                          <div><strong>Words:</strong> {customPresetSettings?.numWords || PRESETS[selectedPreset].numWords}</div>
-                          <div><strong>Timer:</strong> {customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer}s</div>
-                          <div><strong>Rounds:</strong> {customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds}</div>
-                          <div><strong>Bonus Words:</strong> {customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords}</div>
+                    ) : (
+                      // Edit mode
+                      <div className="grid grid-cols-2 gap-3 text-base mb-4">
+                        <div>
+                          <label className="block font-semibold mb-1">Words:</label>
+                          <input
+                            type="number"
+                            min="8"
+                            max="30"
+                            value={customPresetSettings?.numWords || PRESETS[selectedPreset].numWords}
+                            onChange={(e) => setCustomPresetSettings({
+                              numWords: parseInt(e.target.value) || PRESETS[selectedPreset].numWords,
+                              roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
+                              numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
+                              bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
+                            })}
+                            className="w-full p-2 border-2 border-gray-300 rounded"
+                          />
                         </div>
-                      ) : (
-                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
-                          <div>
-                            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '5px', fontSize: '14px'}}>Words:</label>
-                            <input
-                              type="number"
-                              min="8"
-                              max="30"
-                              value={customPresetSettings?.numWords || PRESETS[selectedPreset].numWords}
-                              onChange={(e) => setCustomPresetSettings({
-                                numWords: parseInt(e.target.value) || PRESETS[selectedPreset].numWords,
-                                roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
-                                numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
-                                bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
-                              })}
-                              style={{width: '100%', padding: '8px', border: '2px solid #ccc', borderRadius: '6px'}}
-                            />
-                          </div>
-                          <div>
-                            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '5px', fontSize: '14px'}}>Timer:</label>
-                            <input
-                              type="number"
-                              min="30"
-                              max="300"
-                              value={customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer}
-                              onChange={(e) => setCustomPresetSettings({
-                                numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
-                                roundTimer: parseInt(e.target.value) || PRESETS[selectedPreset].roundTimer,
-                                numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
-                                bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
-                              })}
-                              style={{width: '100%', padding: '8px', border: '2px solid #ccc', borderRadius: '6px'}}
-                            />
-                          </div>
-                          <div>
-                            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '5px', fontSize: '14px'}}>Rounds:</label>
-                            <input
-                              type="number"
-                              min="1"
-                              max="10"
-                              value={customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds}
-                              onChange={(e) => setCustomPresetSettings({
-                                numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
-                                roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
-                                numRounds: parseInt(e.target.value) || PRESETS[selectedPreset].numRounds,
-                                bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
-                              })}
-                              style={{width: '100%', padding: '8px', border: '2px solid #ccc', borderRadius: '6px'}}
-                            />
-                          </div>
-                          <div>
-                            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '5px', fontSize: '14px'}}>Bonus Words:</label>
-                            <input
-                              type="number"
-                              min="0"
-                              max="10"
-                              value={customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords}
-                              onChange={(e) => setCustomPresetSettings({
-                                numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
-                                roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
-                                numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
-                                bonusWords: parseInt(e.target.value) || PRESETS[selectedPreset].bonusWords
-                              })}
-                              style={{width: '100%', padding: '8px', border: '2px solid #ccc', borderRadius: '6px'}}
-                            />
-                          </div>
+                        <div>
+                          <label className="block font-semibold mb-1">Timer (seconds):</label>
+                          <input
+                            type="number"
+                            min="30"
+                            max="300"
+                            value={customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer}
+                            onChange={(e) => setCustomPresetSettings({
+                              numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
+                              roundTimer: parseInt(e.target.value) || PRESETS[selectedPreset].roundTimer,
+                              numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
+                              bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
+                            })}
+                            className="w-full p-2 border-2 border-gray-300 rounded"
+                          />
                         </div>
-                      )}
-                    </div>
+                        <div>
+                          <label className="block font-semibold mb-1">Rounds:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds}
+                            onChange={(e) => setCustomPresetSettings({
+                              numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
+                              roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
+                              numRounds: parseInt(e.target.value) || PRESETS[selectedPreset].numRounds,
+                              bonusWords: customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords
+                            })}
+                            className="w-full p-2 border-2 border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-semibold mb-1">Bonus Words:</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="10"
+                            value={customPresetSettings?.bonusWords || PRESETS[selectedPreset].bonusWords}
+                            onChange={(e) => setCustomPresetSettings({
+                              numWords: customPresetSettings?.numWords || PRESETS[selectedPreset].numWords,
+                              roundTimer: customPresetSettings?.roundTimer || PRESETS[selectedPreset].roundTimer,
+                              numRounds: customPresetSettings?.numRounds || PRESETS[selectedPreset].numRounds,
+                              bonusWords: parseInt(e.target.value) || PRESETS[selectedPreset].bonusWords
+                            })}
+                            className="w-full p-2 border-2 border-gray-300 rounded"
+                          />
+                        </div>
+                      </div>
+                    )}
                     
-                    {/* Edit/Save/Reset Buttons */}
-                    <div style={{display: 'flex', justifyContent: 'space-between', gap: '10px', marginBottom: '20px'}}>
+                    {/* All 3 Buttons Always Visible */}
+                    <div className="flex gap-2">
                       <button
                         onClick={() => {
                           setIsEditingPreset(true);
@@ -2307,24 +2197,14 @@
                           }
                         }}
                         disabled={isEditingPreset}
-                        style={{
-                          flex: 1,
-                          padding: '12px',
-                          borderRadius: '10px',
-                          border: 'none',
-                          fontSize: '16px',
-                          fontWeight: 'bold',
-                          cursor: isEditingPreset ? 'not-allowed' : 'pointer',
-                          background: '#00BCD4',
-                          color: '#FFFFFF',
-                          opacity: isEditingPreset ? 0.5 : 1
-                        }}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Edit
+                        EDIT
                       </button>
                       <button
                         onClick={() => {
                           setIsEditingPreset(false);
+                          // Update game config with custom settings
                           if (customPresetSettings) {
                             updateConfig({
                               ...gameData.config,
@@ -2337,25 +2217,15 @@
                           }
                         }}
                         disabled={!isEditingPreset}
-                        style={{
-                          flex: 1,
-                          padding: '12px',
-                          borderRadius: '10px',
-                          border: 'none',
-                          fontSize: '16px',
-                          fontWeight: 'bold',
-                          cursor: !isEditingPreset ? 'not-allowed' : 'pointer',
-                          background: '#FF9800',
-                          color: '#FFFFFF',
-                          opacity: !isEditingPreset ? 0.5 : 1
-                        }}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Save
+                        SAVE
                       </button>
                       <button
                         onClick={() => {
                           setCustomPresetSettings(null);
                           setIsEditingPreset(false);
+                          // Reset to preset defaults
                           const preset = PRESETS[selectedPreset];
                           updateConfig({
                             ...gameData.config,
@@ -2367,61 +2237,94 @@
                             presetLevel: selectedPreset
                           });
                         }}
-                        style={{
-                          flex: 1,
-                          padding: '12px',
-                          borderRadius: '10px',
-                          border: 'none',
-                          fontSize: '16px',
-                          fontWeight: 'bold',
-                          cursor: 'pointer',
-                          background: '#F44336',
-                          color: '#FFFFFF'
-                        }}
+                        className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-bold transition"
                       >
-                        Reset
+                        RESET
                       </button>
                     </div>
-                    
-                    {/* Let's Play Button */}
+                  </div>
+                </div>
+              )}
+
+              {isHost && !showInviteScreen && (
+                <button
+                  onClick={() => setShowInviteScreen(true)}
+                  className="w-full bg-burnt-orange hover:bg-burnt-orange-dark text-white py-4 rounded-lg font-bold text-xl mb-4 transition"
+                >
+                  NEXT: INVITE PLAYERS
+                </button>
+              )}
+
+              {isHost && showInviteScreen && (
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                  <h3 className="text-2xl font-bold text-center mb-2 text-royal-purple">INVITE PLAYERS</h3>
+                  <p className="text-center text-gray-600 mb-6">Add a personal message and share the invite</p>
+                  
+                  {/* Custom Message Input */}
+                  <div className="mb-6">
+                    <label className="block font-semibold mb-2 text-lg">Your Invite Message:</label>
+                    <textarea
+                      value={inviteMessage}
+                      onChange={(e) => setInviteMessage(e.target.value)}
+                      placeholder="Edit or replace this message..."
+                      maxLength={200}
+                      rows={3}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg text-5xl resize-none"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {inviteMessage.length}/200 characters • Edit the message above to personalize your invite
+                    </p>
+                  </div>
+                  
+                  <div className="bg-cerulean-light border-2 border-cerulean rounded-lg p-6 mb-4">
+                    <p className="font-semibold mb-3 text-lg">Preview:</p>
+                    <div className="bg-white p-4 rounded border-2 border-gray-300 mb-4 text-5xl whitespace-pre-wrap">
+                      {inviteMessage.trim()}
+                      {'\n\nClick to join: '}
+                      <span className="font-mono text-xs break-all text-blue-600">
+                        https://link-logic-game.netlify.app?join={roomCode}
+                      </span>
+                    </div>
+                    <button
+                      onClick={copyInviteLink}
+                      className="w-full bg-cerulean hover:bg-cerulean-dark text-white py-3 rounded-lg font-bold text-5xl transition"
+                    >
+                      {inviteLinkCopied ? '✓ COPIED TO CLIPBOARD!' : 'COPY MESSAGE & LINK'}
+                    </button>
+                    <div className="mt-4 text-5xl text-gray-700">
+                      <p className="font-semibold mb-2">📱 Paste into:</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li>Text message (SMS)</li>
+                        <li>WhatsApp</li>
+                        <li>Email</li>
+                        <li>Discord, Slack, etc.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowInviteScreen(false)}
+                      className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg font-bold text-lg transition"
+                    >
+                      BACK
+                    </button>
                     <button
                       onClick={startGame}
                       disabled={players.length < 1}
-                      style={{
-                        width: '100%',
-                        padding: '18px',
-                        borderRadius: '12px',
-                        background: 'transparent',
-                        border: '3px solid #FFFFFF',
-                        color: '#FFFFFF',
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        cursor: players.length < 1 ? 'not-allowed' : 'pointer',
-                        opacity: players.length < 1 ? 0.5 : 1,
-                        transition: 'all 0.2s'
-                      }}
+                      className="flex-1 bg-dark-cyan hover:bg-dark-cyan-dark text-white py-3 rounded-lg font-bold text-lg transition disabled:bg-gray-300"
                     >
-                      {players.length < 1 ? 'WAITING FOR PLAYERS...' : "Let's Play"}
+                      {players.length < 1 ? 'WAITING...' : 'START GAME'}
                     </button>
-                  </>
-                )}
-                
-                {/* Non-host waiting message */}
-                {!isHost && (
-                  <div style={{
-                    background: '#FFFFFF',
-                    border: '3px solid #00BCD4',
-                    borderRadius: '15px',
-                    padding: '20px',
-                    textAlign: 'center',
-                    marginTop: '20px'
-                  }}>
-                    <p style={{fontWeight: 'bold', color: '#00BCD4', fontSize: '18px'}}>
-                      Waiting for host to start the game...
-                    </p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {!isHost && (
+                <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-4 text-center">
+                  <p className="font-semibold text-blue-800">Waiting for host to start the game...</p>
+                </div>
+              )}
             </div>
           </div>
         );
