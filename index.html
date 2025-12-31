@@ -1889,21 +1889,24 @@
                 {/* Next Step - LEFT aligned */}
                 <p className="mb-4" style={{color: '#FFFFFF', fontSize: '14px', textAlign: 'left'}}>Next Step: Set Presets</p>
                 
+                {/* Game Number Input - for Join a Game */}
+                <div className="mb-3">
+                  <label className="block font-bold mb-2" style={{color: '#00B0F0', fontSize: '16px'}}>Game Number:</label>
+                  <input
+                    type="text"
+                    value={joinRoomInput}
+                    onChange={(e) => setJoinRoomInput(e.target.value.toUpperCase())}
+                    placeholder="Enter 6-digit code"
+                    className="w-full p-2 rounded-lg outline-none uppercase"
+                    style={{backgroundColor: '#FFFFFF', border: '3px solid #00B0F0', color: '#000000', fontSize: '14px'}}
+                    maxLength={6}
+                  />
+                </div>
+                
                 {/* Join a Game - Orange button */}
                 <button
-                  onClick={() => {
-                    if (!playerName.trim()) {
-                      alert('Please enter your player name first');
-                      return;
-                    }
-                    // Show join room input
-                    const code = prompt('Enter Game Number:');
-                    if (code) {
-                      setJoinRoomInput(code.toUpperCase());
-                      joinRoom();
-                    }
-                  }}
-                  disabled={!playerName.trim()}
+                  onClick={joinRoom}
+                  disabled={!playerName.trim() || !joinRoomInput.trim()}
                   className="w-full py-4 rounded-lg font-bold text-xl mb-2 transition disabled:opacity-50"
                   style={{background: '#F88E00', color: '#FFFFFF', fontSize: '22px'}}
                 >
