@@ -2016,29 +2016,6 @@
                 
                 <div>
                   <h2 className="text-5xl font-bold mb-2" style={{color: '#7B2CBF'}}>❓ Challenges</h2>
-                  <p>Think someone's link doesn't work? Challenge it! Other players vote to accept or reject.</p>
-                </div>
-                
-                <div>
-                  <h2 className="text-5xl font-bold mb-2" style={{color: '#7B2CBF'}}>🔄 Reconnecting</h2>
-                  <p>If you get disconnected during a game, check your invitation text for the <strong>Game Room</strong> link to rejoin quickly!</p>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => setScreen('welcome')}
-                className="w-full py-4 rounded-lg font-bold text-5xl mt-6 transition shadow-lg hover:shadow-xl"
-                style={{background: 'linear-gradient(180deg, #7B2CBF 0%, #7B2CBF 50%, #7b1fa2 100%)', color: '#ffffff'}}
-              >
-                BACK TO MENU
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      // Practice Mode Setup Screen
-
       if (screen === 'lobby' && gameData?.gameState === 'lobby') {
         return (
           <div className="min-h-screen p-5 flex items-center justify-center" style={{background: '#000000'}}>
