@@ -18,15 +18,15 @@
     
     body {
       font-family: Arial, sans-serif;
-      background: #000000;
-      color: #FFFFFF;
+      background: #000;
+      color: #fff;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
     
-    /* Screen Frame - Based on welcome-screen-sample.html */
+    /* Screen Frame - UPDATED: Thinner border, minimal curve */
     .screen-frame {
-      background: #000000;
+      background: #000;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -35,9 +35,9 @@
     }
 
     .screen-container {
-      background: #000000;
-      border: 8px solid #8B5CF6;
-      border-radius: 40px;
+      background: #000;
+      border: 4px solid #7B2CBF;  /* Changed from 8px to 4px, using exact color */
+      border-radius: 20px;  /* Changed from 40px to 20px for minimal curve */
       width: 100%;
       max-width: 480px;
       min-height: 85vh;
@@ -60,36 +60,38 @@
       border-radius: 8px;
     }
 
+    /* UPDATED: Logo frame fills interior with minimal gap */
     .logo-frame {
-      background: #000000;
-      border: 6px solid #8B5CF6;
-      border-radius: 20px;
-      padding: 20px;
-      margin: 0 auto 40px;
+      background: #000;
+      border: 4px solid #7B2CBF;  /* Thinner border */
+      border-radius: 12px;  /* Minimal curve */
+      padding: 10px;  /* Reduced padding */
+      margin: 0 auto 30px;
       display: flex;
       justify-content: center;
       align-items: center;
-      max-width: 380px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .logo-frame img {
       width: 100%;
-      max-width: 320px;
+      max-width: 100%;
       height: auto;
       display: block;
     }
 
     /* Page Titles */
     .page-title {
-      color: #FFFFFF;
+      color: #fff;
       font-size: 42px;
       font-weight: bold;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .page-title-small {
-      color: #FFFFFF;
+      color: #fff;
       font-size: 36px;
       font-weight: bold;
       text-align: center;
@@ -112,56 +114,57 @@
 
     /* Timer Box */
     .timer-box {
-      background: #FFFFFF;
-      border: 3px solid #F44336;
+      background: #fff;
+      border: 3px solid #F31418;
       border-radius: 8px;
-      padding: 8px 12px;
-      color: #F44336;
-      font-size: 20px;
+      padding: 6px 10px;
+      color: #F31418;
+      font-size: 18px;
       font-weight: bold;
       text-align: center;
       line-height: 1.2;
+      min-width: 60px;
     }
 
     .timer-label {
-      font-size: 12px;
-      color: #F44336;
+      font-size: 10px;
+      color: #F31418;
     }
 
     /* Content Box - Purple Background Container */
     .content-box {
-      background: #8B5CF6;
+      background: #7B2CBF;  /* Using exact purple */
       border-radius: 20px;
-      padding: 30px 25px;
+      padding: 25px 20px;
       margin-top: 10px;
     }
 
     /* Section Titles */
     .section-title {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 15px;
     }
 
     .section-title-white {
-      color: #FFFFFF;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .mode-header {
-      color: #F44336;
+      color: #fff;
       font-size: 22px;
       font-weight: bold;
       text-align: center;
       margin-bottom: 20px;
     }
 
+    .mode-header {
+      color: #F31418;
+      font-size: 24px;  /* Increased */
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
     .round-title {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 28px;
       font-weight: bold;
       text-align: center;
@@ -169,7 +172,7 @@
     }
 
     .round-complete {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 24px;
       font-weight: bold;
       text-align: center;
@@ -177,7 +180,7 @@
     }
 
     .winner-title {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 56px;
       font-weight: bold;
       margin-bottom: 30px;
@@ -186,7 +189,7 @@
 
     /* Form Elements */
     .label-orange {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 8px;
@@ -194,7 +197,7 @@
     }
 
     .label-cyan {
-      color: #00E5FF;
+      color: #00B0F0;  /* Using exact cyan */
       font-size: 16px;
       font-weight: bold;
       margin-bottom: 8px;
@@ -205,40 +208,40 @@
       width: 100%;
       padding: 12px 15px;
       border-radius: 8px;
-      border: 3px solid #00BCD4;
-      background: #FFFFFF;
-      color: #000000;
+      border: none;
+      background: #ECECEC;  /* Using exact gray */
+      color: #000;
       font-size: 16px;
       margin-bottom: 15px;
     }
 
     .input-field::placeholder {
-      color: #999999;
+      color: #C0C0C0;  /* Using exact gray */
     }
 
     .input-field:read-only {
       background: #F5F5F5;
-      color: #666666;
+      color: #666;
     }
 
     .input-gradient {
-      border: 3px solid #FF9800;
+      border: 3px solid #F88E00;
       border-radius: 8px;
       background: linear-gradient(90deg, 
         rgba(255,152,0,0.1),
         rgba(255,87,34,0.1),
         rgba(233,30,99,0.1),
-        rgba(156,39,176,0.1));
+        rgba(123,44,191,0.1));
     }
 
     .required-text {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 14px;
       margin: 5px 0 15px 0;
     }
 
     .heading-cyan {
-      color: #00E5FF;
+      color: #00B0F0;
       font-size: 22px;
       font-weight: bold;
       margin: 25px 0 15px 0;
@@ -249,7 +252,7 @@
     .input-row {
       display: flex;
       gap: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .input-group {
@@ -257,7 +260,7 @@
     }
 
     .input-label {
-      color: #FFFFFF;
+      color: #fff;
       font-size: 14px;
       font-weight: bold;
       text-align: center;
@@ -269,13 +272,35 @@
       padding: 10px;
       border-radius: 8px;
       border: none;
-      background: #FFFFFF;
+      background: #fff;
       text-align: center;
-      color: #666666;
+      color: #666;
       font-size: 14px;
     }
 
-    /* Buttons */
+    /* Buttons - UPDATED: Enter button centered and deeper purple */
+    .btn-enter {
+      background: #7B2CBF;  /* Deeper purple */
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 18px 80px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin: 30px auto 0;  /* Centered */
+      display: block;
+    }
+
+    .btn-enter:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-enter:active {
+      transform: scale(0.98);
+    }
+
     .btn {
       padding: 15px 30px;
       border-radius: 12px;
@@ -290,23 +315,6 @@
       transform: scale(0.98);
     }
 
-    .btn-enter {
-      background: #8B5CF6;
-      color: #FFFFFF;
-      border: none;
-      border-radius: 30px;
-      padding: 18px 80px;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s;
-      margin-top: 30px;
-    }
-
-    .btn-enter:hover {
-      transform: scale(1.05);
-    }
-
     .btn-action {
       width: 100%;
       padding: 18px;
@@ -315,22 +323,22 @@
       font-size: 20px;
       font-weight: bold;
       cursor: pointer;
-      margin-bottom: 12px;
+      margin-bottom: 8px;  /* Reduced from 12px */
       transition: transform 0.1s;
-      color: #FFFFFF;
+      color: #fff;
     }
 
-    .btn-red { background: #F44336; }
-    .btn-orange { background: #FF9800; }
-    .btn-cyan { background: #00BCD4; }
-    .btn-purple { background: #8B5CF6; }
+    .btn-red { background: #F31418; }  /* Using exact red */
+    .btn-orange { background: #F88E00; }  /* Using exact orange */
+    .btn-cyan { background: #00B0F0; }  /* Using exact cyan */
+    .btn-purple { background: #7B2CBF; }  /* Using exact purple */
 
     .btn-small {
       width: auto;
       padding: 12px 40px;
       font-size: 16px;
-      background: #FF9800;
-      color: #FFFFFF;
+      background: #F88E00;
+      color: #fff;
       border: none;
       border-radius: 10px;
       cursor: pointer;
@@ -340,8 +348,8 @@
     }
 
     .btn-gray {
-      background: #E0E0E0;
-      color: #666666;
+      background: #C0C0C0;
+      color: #666;
       width: 100%;
       margin-bottom: 15px;
     }
@@ -351,8 +359,8 @@
       padding: 15px;
       border-radius: 12px;
       background: transparent;
-      border: 3px solid #FFFFFF;
-      color: #FFFFFF;
+      border: 3px solid #fff;
+      color: #fff;
       font-size: 20px;
       font-weight: bold;
       cursor: pointer;
@@ -367,9 +375,9 @@
       width: 100%;
       padding: 18px;
       border-radius: 12px;
-      background: #FF9800;
+      background: #F88E00;
       border: none;
-      color: #FFFFFF;
+      color: #fff;
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
@@ -381,13 +389,13 @@
       width: 100%;
       padding: 18px;
       border-radius: 12px;
-      background: #F44336;
+      background: #F31418;
       border: none;
-      color: #FFFFFF;
+      color: #fff;
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
-      margin-bottom: 25px;
+      margin-bottom: 20px;  /* Reduced from 25px */
       transition: transform 0.1s;
     }
 
@@ -395,9 +403,9 @@
       width: 100%;
       padding: 18px;
       border-radius: 12px;
-      background: #FF9800;
+      background: #F88E00;
       border: none;
-      color: #FFFFFF;
+      color: #fff;
       font-size: 22px;
       font-weight: bold;
       cursor: pointer;
@@ -426,10 +434,10 @@
 
     .btn-preset-control {
       flex: 1;
-      padding: 12px;
+      padding: 10px;  /* Reduced from 12px */
       border-radius: 10px;
       border: none;
-      font-size: 16px;
+      font-size: 15px;  /* Reduced from 16px */
       font-weight: bold;
       cursor: pointer;
       transition: transform 0.1s;
@@ -445,17 +453,19 @@
       transition: transform 0.1s;
     }
 
-    /* Next Step Text */
+    /* Next Step Text - UPDATED: Align left */
     .next-step {
-      color: #FFFFFF;
+      color: #fff;
       font-size: 14px;
-      text-align: center;
-      margin-bottom: 20px;
+      text-align: left;  /* Changed from center */
+      margin-bottom: 15px;  /* Reduced from 20px */
+      padding-left: 5px;
     }
 
+    /* UPDATED: Larger font for subtitle */
     .subtitle {
-      color: #FFFFFF;
-      font-size: 20px;
+      color: #fff;
+      font-size: 22px;  /* Increased from 20px */
       text-align: center;
       margin-bottom: 15px;
       line-height: 1.4;
@@ -466,20 +476,20 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      background: #FFFFFF;
-      border: 3px solid #8B5CF6;
+      background: #fff;
+      border: 3px solid #7B2CBF;
       border-radius: 12px;
       padding: 15px;
       margin-bottom: 20px;
     }
 
     .word-box {
-      background: #00BCD4;
+      background: #00B0F0;  /* Using exact cyan */
       padding: 15px 10px;
       border-radius: 8px;
       text-align: center;
       font-weight: bold;
-      color: #000000;
+      color: #000;
       font-size: 13px;
       cursor: pointer;
       transition: transform 0.1s;
@@ -487,12 +497,12 @@
     }
 
     .word-box.bonus {
-      background: #FFC107;
+      background: #F88E00;  /* Using exact orange */
     }
 
     .word-box.selected {
-      background: #8B5CF6;
-      color: #FFFFFF;
+      background: #7B2CBF;
+      color: #fff;
       transform: scale(1.05);
     }
 
@@ -500,7 +510,7 @@
       transform: scale(0.95);
     }
 
-    /* Preset Grid */
+    /* Preset Grid - UPDATED with exact colors */
     .preset-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -509,12 +519,12 @@
     }
 
     .preset-btn {
-      padding: 20px;
+      padding: 18px 10px;  /* Reduced from 20px */
       border-radius: 12px;
       border: none;
       font-size: 16px;
       font-weight: bold;
-      color: #FFFFFF;
+      color: #fff;
       cursor: pointer;
       transition: transform 0.1s;
       text-align: center;
@@ -525,32 +535,33 @@
     }
 
     .preset-btn.selected {
-      box-shadow: 0 0 0 4px #FFFFFF;
+      box-shadow: 0 0 0 4px #fff;
     }
 
-    .preset-1 { background: #00BCD4; }
-    .preset-2 { background: #0288D1; }
-    .preset-3 { background: #1976D2; }
-    .preset-4 { background: #FFC107; }
-    .preset-5 { background: #FF9800; }
-    .preset-6 { background: #FF5722; }
-    .preset-7 { background: #FF8A80; }
-    .preset-8 { background: #F44336; }
-    .preset-9 { background: #C62828; }
+    /* Exact preset colors from palette */
+    .preset-1 { background: #00CCFF; }
+    .preset-2 { background: #0099FF; }
+    .preset-3 { background: #0066FF; }
+    .preset-4 { background: #FFCC00; color: #000; }
+    .preset-5 { background: #FF9933; }
+    .preset-6 { background: #FF6600; }
+    .preset-7 { background: #FF7F7F; }
+    .preset-8 { background: #FF3737; }
+    .preset-9 { background: #F31418; }
 
-    /* Preset Info Box */
+    /* Preset Info Box - UPDATED heading */
     .preset-info-box {
-      background: #FFFFFF;
-      border: 3px solid #000000;
+      background: #fff;
+      border: 3px solid #000;
       border-radius: 15px;
       padding: 20px;
       margin: 20px 0;
-      color: #000000;
+      color: #000;
     }
 
     .preset-info-box h3 {
       font-size: 18px;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
       text-align: center;
     }
 
@@ -558,7 +569,7 @@
       font-size: 14px;
       margin-bottom: 15px;
       text-align: center;
-      color: #000000;
+      color: #666;
     }
 
     .preset-details {
@@ -581,8 +592,8 @@
     }
 
     .room-label {
-      background: #00BCD4;
-      color: #FFFFFF;
+      background: #00B0F0;
+      color: #fff;
       padding: 10px 15px;
       border-radius: 8px;
       font-size: 14px;
@@ -591,28 +602,39 @@
     }
 
     .room-display {
-      background: #FFFFFF;
+      background: #fff;
       padding: 10px 15px;
       border-radius: 8px;
       flex: 1;
       text-align: center;
-      color: #666666;
+      color: #666;
       font-size: 16px;
       font-weight: bold;
     }
 
-    /* Invitation Box */
+    /* Invitation Box - UPDATED: Copy button to the right */
+    .invite-section {
+      margin-bottom: 15px;
+    }
+
+    .invite-container {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 15px;
+    }
+
     .invite-box {
-      background: #FFFFFF;
+      background: #fff;
       border-radius: 12px;
       padding: 15px;
-      margin-bottom: 15px;
-      position: relative;
-      min-height: 120px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .invite-box label {
-      color: #666666;
+      color: #666;
       font-size: 14px;
       display: block;
       margin-bottom: 8px;
@@ -626,32 +648,37 @@
       resize: vertical;
       font-family: inherit;
       font-size: 14px;
-      color: #000000;
+      color: #000;
+      flex: 1;
     }
 
     .invite-text {
-      color: #000000;
+      color: #000;
       font-size: 14px;
       line-height: 1.6;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
     }
 
     .auto-text {
-      color: #2196F3;
+      color: #00B0F0;
       font-weight: bold;
     }
 
-    /* Copy Button */
-    .copy-btn-wrapper {
+    /* Copy Button - Now vertical next to textarea */
+    .copy-btn-vertical {
       display: flex;
-      justify-content: flex-end;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      justify-content: center;
+      gap: 5px;
+      min-width: 80px;
     }
 
     .copy-icon {
-      background: #00BCD4;
-      color: #FFFFFF;
+      background: #00B0F0;
+      color: #fff;
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -664,12 +691,14 @@
     }
 
     .copy-label {
-      color: #FFFFFF;
-      font-size: 14px;
+      color: #fff;
+      font-size: 12px;
       font-weight: bold;
+      text-align: center;
+      line-height: 1.2;
     }
 
-    /* Traffic Lights / Countdown */
+    /* Traffic Lights / Countdown - UPDATED: Red, Yellow, Green */
     .traffic-lights {
       display: flex;
       justify-content: space-around;
@@ -680,19 +709,31 @@
       width: 70px;
       height: 70px;
       border-radius: 50%;
-      background: #FFFFFF;
-      border: 4px solid #8B5CF6;
+      background: #ECECEC;
+      border: 4px solid #7B2CBF;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       font-weight: bold;
-      color: #666666;
+      color: #666;
     }
 
-    .traffic-light.active {
-      background: #00BCD4;
-      color: #FFFFFF;
+    .traffic-light.active-red {
+      background: #F31418;
+      color: #fff;
+      animation: pulse 0.5s;
+    }
+
+    .traffic-light.active-yellow {
+      background: #FFCC00;
+      color: #000;
+      animation: pulse 0.5s;
+    }
+
+    .traffic-light.active-green {
+      background: #4CAF50;
+      color: #fff;
       animation: pulse 0.5s;
     }
 
@@ -703,8 +744,8 @@
 
     /* Players Ready */
     .players-ready-box {
-      background: #FFFFFF;
-      border: 3px solid #000000;
+      background: #fff;
+      border: 3px solid #000;
       border-radius: 15px;
       padding: 15px;
     }
@@ -714,7 +755,7 @@
       font-weight: bold;
       text-align: center;
       margin-bottom: 15px;
-      color: #000000;
+      color: #000;
     }
 
     .player-grid {
@@ -724,18 +765,18 @@
     }
 
     .player-box {
-      background: #FFFFFF;
-      border: 3px solid #8B5CF6;
+      background: #fff;
+      border: 3px solid #7B2CBF;
       border-radius: 10px;
       padding: 12px;
       text-align: center;
-      color: #666666;
+      color: #666;
       font-size: 14px;
     }
 
     /* Game Preview */
     .game-preview {
-      background: #8B5CF6;
+      background: #7B2CBF;
       border-radius: 20px;
       padding: 20px;
       margin-bottom: 15px;
@@ -763,7 +804,7 @@
 
     /* Controls Box */
     .controls-box {
-      background: #8B5CF6;
+      background: #7B2CBF;
       border-radius: 20px;
       padding: 20px;
     }
@@ -775,8 +816,8 @@
     }
 
     .btn-host-small {
-      background: #FF9800;
-      color: #FFFFFF;
+      background: #F88E00;
+      color: #fff;
       padding: 10px 20px;
       border-radius: 10px;
       border: none;
@@ -786,8 +827,8 @@
     }
 
     .btn-tap {
-      background: #00BCD4;
-      color: #FFFFFF;
+      background: #00B0F0;
+      color: #fff;
       padding: 10px 30px;
       border-radius: 10px;
       border: none;
@@ -798,8 +839,8 @@
     }
 
     .btn-waiting {
-      background: #00BCD4;
-      color: #FFFFFF;
+      background: #00B0F0;
+      color: #fff;
       padding: 12px;
       border-radius: 10px;
       border: none;
@@ -820,19 +861,20 @@
     }
 
     .key {
-      background: #FFFFFF;
-      border: 1px solid #CCCCCC;
+      background: #fff;
+      border: 1px solid #ccc;
       border-radius: 4px;
-      padding: 8px 4px;
+      padding: 10px 4px;
       text-align: center;
-      font-size: 11px;
-      color: #000000;
+      font-size: 12px;
+      color: #000;
       cursor: pointer;
       user-select: none;
+      font-weight: 500;
     }
 
     .key:active {
-      background: #DDDDDD;
+      background: #ddd;
     }
 
     .key-wide {
@@ -843,47 +885,49 @@
       grid-column: span 5;
     }
 
-    /* Scoring Tables */
+    /* Scoring Tables - UPDATED: Player names smaller and left-aligned */
     .player-table {
-      margin-bottom: 20px;
+      margin-bottom: 15px;  /* Reduced from 20px */
     }
 
     .player-name-header {
-      background: #FFFFFF;
-      border: 3px solid #FF9800;
+      background: #fff;
+      border: 3px solid #F88E00;
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px 12px;  /* Reduced padding */
       margin-bottom: 10px;
       font-weight: bold;
-      color: #000000;
-      text-align: center;
+      color: #000;
+      text-align: left;  /* Changed from center */
+      font-size: 16px;  /* Reduced from default */
     }
 
     .table-content {
-      background: #FFFFFF;
+      background: #fff;
       border-radius: 8px;
       padding: 10px;
     }
 
     .table-header {
       display: grid;
-      grid-template-columns: 30px 2fr 1.2fr 70px 70px 70px;
+      grid-template-columns: 30px 2fr 1fr 60px 60px 60px;
       padding: 8px 5px;
       font-weight: bold;
-      font-size: 13px;
-      color: #000000;
-      border-bottom: 2px solid #EEEEEE;
+      font-size: 12px;
+      color: #000;
+      border-bottom: 2px solid #eee;
       gap: 5px;
+      align-items: center;
     }
 
     .table-row {
       display: grid;
-      grid-template-columns: 30px 2fr 1.2fr 70px 70px 70px;
-      padding: 8px 5px;
+      grid-template-columns: 30px 2fr 1fr 60px 60px 60px;
+      padding: 10px 5px;
       align-items: center;
-      border-bottom: 1px solid #EEEEEE;
+      border-bottom: 1px solid #eee;
       font-size: 12px;
-      color: #000000;
+      color: #000;
       gap: 5px;
     }
 
@@ -892,27 +936,28 @@
     }
 
     .link-word {
-      color: #2196F3;
+      color: #00B0F0;
       font-weight: bold;
     }
 
+    /* UPDATED: Thumbs up icon */
     .icon-btn {
       width: 35px;
       height: 35px;
       border-radius: 50%;
       border: none;
-      background: #64B5F6;
-      color: #FFFFFF;
+      background: #00B0F0;
+      color: #fff;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
       margin: 0 auto;
     }
 
     .icon-btn.like {
-      background: #FFA726;
+      background: #F88E00;
     }
 
     .points {
@@ -922,35 +967,42 @@
 
     /* Winner Screen */
     .trophy {
-      font-size: 120px;
-      margin-bottom: 30px;
+      font-size: 100px;
+      margin: 20px 0 30px;
       text-align: center;
     }
 
+    .trophy img {
+      width: 120px;
+      height: auto;
+    }
+
     .winner-name-box {
-      background: #FFFFFF;
+      background: #fff;
       border-radius: 10px;
       padding: 15px;
       margin-bottom: 30px;
-      color: #666666;
+      color: #666;
       font-size: 18px;
       text-align: center;
     }
 
     .standings-table {
-      background: #FFFFFF;
+      background: #fff;
       border-radius: 10px;
       overflow: hidden;
       margin-bottom: 30px;
     }
 
+    /* UPDATED: Final Standings centered */
     .table-header-section {
-      background: #E0E0E0;
+      background: #ECECEC;
       padding: 12px;
       font-weight: bold;
       font-size: 18px;
-      color: #000000;
-      border-bottom: 2px solid #8B5CF6;
+      color: #000;
+      border-bottom: 2px solid #7B2CBF;
+      text-align: center;  /* Centered */
     }
 
     .table-header-row {
@@ -960,17 +1012,17 @@
       background: #F5F5F5;
       font-weight: bold;
       font-size: 14px;
-      color: #000000;
-      border-bottom: 2px solid #DDDDDD;
+      color: #000;
+      border-bottom: 2px solid #ddd;
     }
 
     .table-row-standings {
       display: grid;
       grid-template-columns: 1.5fr 1fr 1fr 1fr;
       padding: 10px;
-      color: #666666;
+      color: #666;
       font-size: 14px;
-      border-bottom: 1px solid #EEEEEE;
+      border-bottom: 1px solid #eee;
     }
 
     .table-row-standings:last-child {
@@ -979,7 +1031,7 @@
 
     /* Instructions */
     .section-header {
-      color: #FFD700;
+      color: #F88E00;
       font-size: 18px;
       font-weight: bold;
       margin: 20px 0 10px 0;
@@ -993,19 +1045,19 @@
     }
 
     .checkbox-icon {
-      color: #FF9800;
+      color: #F88E00;
       font-size: 20px;
     }
 
     .content-box p {
       margin-bottom: 10px;
-      color: #FFFFFF;
+      color: #fff;
     }
 
     .content-box ol {
       margin-left: 20px;
       margin-bottom: 15px;
-      color: #FFFFFF;
+      color: #fff;
     }
 
     .content-box ol li {
@@ -1015,7 +1067,7 @@
     .content-box ul {
       margin-left: 20px;
       margin-bottom: 10px;
-      color: #FFFFFF;
+      color: #fff;
     }
 
     .content-box ul li {
@@ -1029,64 +1081,41 @@
       margin: 10px 0;
     }
 
-    .highlight {
-      color: #FFD700;
-      font-weight: bold;
+    /* Coming Soon - Simplified */
+    .coming-soon-title {
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      margin: 20px 0 10px;
     }
 
-    /* Coming Soon */
-    .coming-soon-title {
-      color: #FFFFFF;
-      font-size: 20px;
+    .coming-soon-subtitle {
+      color: #fff;
+      font-size: 14px;
       text-align: center;
       margin-bottom: 10px;
     }
 
-    .coming-soon-subtitle {
-      color: #FFFFFF;
-      font-size: 14px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    /* Contacts Table */
-    .contacts-table {
-      background: #FFFFFF;
+    .coming-soon-placeholder {
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .contacts-table-header {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 80px 1fr;
-      padding: 8px;
-      background: #00BCD4;
-      color: #FFFFFF;
-      font-weight: bold;
-      font-size: 13px;
+      padding: 15px;
       text-align: center;
+      color: #fff;
+      font-size: 14px;
     }
 
-    .contacts-table-row {
+    .placeholder-row {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 80px 1fr;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
       padding: 8px;
-      border-bottom: 1px solid #EEEEEE;
+      background: #00B0F0;
+      color: #fff;
+      border-radius: 5px;
       font-size: 12px;
-      align-items: center;
+      font-weight: bold;
       text-align: center;
-    }
-
-    .contacts-table-row:last-child {
-      border-bottom: none;
-    }
-
-    .contact-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #CCCCCC;
-      margin: 0 auto;
     }
 
     /* Responsive */
@@ -1105,7 +1134,7 @@
       }
 
       .logo-frame {
-        padding: 15px;
+        padding: 8px;
       }
 
       .word-grid {
@@ -1144,12 +1173,12 @@
     const WORD_BANKS = {
       training: ['CAT', 'DOG', 'SUN', 'MOON', 'CAR', 'BUS', 'RED', 'BLUE', 'HOT', 'COLD', 
                  'BIG', 'SMALL', 'UP', 'DOWN', 'YES', 'NO', 'DAY', 'NIGHT', 'HAPPY', 'SAD'],
-      children: ['APPLE', 'TREE', 'HOUSE', 'WATER', 'FIRE', 'PAPER', 'BOOK', 'GREEN', 'LIGHT', 'SWING',
-                 'COLD', 'SOFT', 'HARD', 'STONE', 'WIND', 'SWEET', 'FAST', 'BLUE', 'WARM', 'ANIMAL'],
+      children: ['HARD', 'ANIMAL', 'SWING', 'FIRE', 'WARM', 'STONE', 'GREEN', 'BOOK', 'COLD', 'SOFT', 'PAPER', 'HOUSE',
+                 'APPLE', 'TREE', 'HOUSE', 'WATER', 'FIRE', 'PAPER', 'BOOK', 'GREEN'],
       beginners: ['ABSTRACT', 'CONCEPT', 'THEORY', 'LOGIC', 'REASON', 'EMOTION', 'THOUGHT', 'MEMORY', 'DREAM', 'REALITY',
-                  'TRADITION', 'CULTURE', 'SOCIETY', 'COMMUNITY', 'INDIVIDUAL', 'FREEDOM', 'JUSTICE', 'EQUALITY', 'POWER', 'AUTHORITY'],
+                  'TRADITION', 'CULTURE', 'SOCIETY', 'COMMUNITY', 'INDIVIDUAL', 'FREEDOM', 'JUSTICE', 'EQUALITY'],
       adults: ['PHILOSOPHY', 'ETHICS', 'MORALITY', 'VIRTUE', 'INTEGRITY', 'HONESTY', 'TRUST', 'LOYALTY', 'RESPECT', 'DIGNITY',
-               'CONFLICT', 'RESOLUTION', 'COMPROMISE', 'NEGOTIATION', 'AGREEMENT', 'COOPERATION', 'COMPETITION', 'STRATEGY', 'TACTICS', 'PLANNING']
+               'CONFLICT', 'RESOLUTION', 'COMPROMISE', 'NEGOTIATION', 'AGREEMENT', 'COOPERATION']
     };
 
     // Preset configurations
@@ -1199,12 +1228,13 @@
     // Logo URLs
     const LOGO_FULL = "https://raw.githubusercontent.com/Link-logic/link-logic-game/main/logo-full.png";
     const LOGO_SMALL = "https://raw.githubusercontent.com/Link-logic/link-logic-game/main/logo-small.png";
+    const TROPHY_IMG = "https://raw.githubusercontent.com/Link-logic/link-logic-game/main/trophy.png";
 
     // Main App Component
     const LinkLogicApp = () => {
       const [screen, setScreen] = useState('welcome');
       const [playerName, setPlayerName] = useState('');
-      const [playerRating, setPlayerRating] = useState('New Player');
+      const [playerRating, setPlayerRating] = useState(500);  // Start at 500
       
       // Registration state
       const [regName, setRegName] = useState('');
@@ -1226,6 +1256,7 @@
       const [countdown, setCountdown] = useState(0);
       const [inviteMessage, setInviteMessage] = useState('');
       const [submissions, setSubmissions] = useState([]);
+      const [returnScreen, setReturnScreen] = useState('register');  // Track where to return from instructions
       
       // Check if player is registered
       useEffect(() => {
@@ -1233,7 +1264,7 @@
         if (registration) {
           const data = JSON.parse(registration);
           setPlayerName(data.playerName);
-          setPlayerRating(data.rating || 'New Player');
+          setPlayerRating(data.rating || 500);
         }
       }, []);
 
@@ -1255,7 +1286,7 @@
             
             <div className="logo-frame">
               <img src={LOGO_FULL} alt="Link Logic" onError={(e) => {
-                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200'%3E%3Crect fill='%238B5CF6' width='320' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white' font-weight='bold'%3ELink Logic%3C/text%3E%3C/svg%3E";
+                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%237B2CBF' width='400' height='250'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white' font-weight='bold'%3ELink Logic%3C/text%3E%3C/svg%3E";
               }} />
             </div>
             
@@ -1280,7 +1311,6 @@
             setPlayerNameAvailable(false);
             return;
           }
-          // Simulate check
           const isAvailable = !['admin', 'test', 'user'].includes(regPlayerName.toLowerCase());
           setPlayerNameAvailable(isAvailable);
         };
@@ -1296,13 +1326,13 @@
             cell: regCell,
             email: regEmail,
             playerName: regPlayerName,
-            rating: 'New Player',
+            rating: 500,
             registeredAt: new Date().toISOString()
           };
           
           localStorage.setItem('linkLogicRegistration', JSON.stringify(registration));
           setPlayerName(regPlayerName);
-          setPlayerRating('New Player');
+          setPlayerRating(500);
           setScreen('playerModes');
         };
 
@@ -1366,7 +1396,10 @@
                 )}
                 
                 <div className="button-row">
-                  <button className="btn btn-orange" onClick={() => setScreen('instructions')}>
+                  <button className="btn btn-orange" onClick={() => {
+                    setReturnScreen('register');
+                    setScreen('instructions');
+                  }}>
                     Instructions
                   </button>
                   <button className="btn btn-orange" onClick={handleRegister}>
@@ -1379,7 +1412,7 @@
         );
       };
 
-      // Instructions Screen
+      // Instructions Screen - with Back button
       const InstructionsScreen = () => (
         <div className="screen-frame">
           <div className="screen-container scrollable">
@@ -1422,21 +1455,9 @@
                 <span>Example</span>
               </div>
               <div className="example-box">
-                <p><strong>Words:</strong> SNOW, FIRE,  <strong>Link Word:</strong> WHITE</p>
+                <p><strong>Words:</strong> SNOW, FIRE  <strong>Link Word:</strong> WHITE</p>
                 <p><strong>Connection:</strong> Snow is white, fire can burn white-hot</p>
               </div>
-              
-              <div className="section-header">
-                <span className="checkbox-icon">☑</span>
-                <span>Like Points</span>
-              </div>
-              <p>Vote for the funniest or most creative link each round to give out bonus points! Voting is optional but in every round one link is usually unique.</p>
-              
-              <div className="section-header">
-                <span className="checkbox-icon">☑</span>
-                <span>Challenges</span>
-              </div>
-              <p>If you think someone's link doesn't work, challenge it! The player who was challenged, then has the opportunity to defend the link. The player's connection thought or sharing it with a group if all are present. The other players then vote to accept or reject the link.</p>
               
               <div className="section-header">
                 <span className="checkbox-icon">☑</span>
@@ -1456,19 +1477,31 @@
               
               <div className="section-header">
                 <span className="checkbox-icon">☑</span>
+                <span>Challenges</span>
+              </div>
+              <p>If you think someone's link doesn't work, challenge it! The player who was challenged, then has the opportunity to defend the link by typing in their defense. The other players then vote to accept or reject the link.</p>
+              
+              <div className="section-header">
+                <span className="checkbox-icon">☑</span>
+                <span>Like Points</span>
+              </div>
+              <p>Vote for the funniest or most creative link each round! Voting is optional but in every round one link is usually unique.</p>
+              
+              <div className="section-header">
+                <span className="checkbox-icon">☑</span>
                 <span>Winner</span>
               </div>
               <p>The player with the most points after all rounds is the winner!</p>
             </div>
             
-            <button className="btn-small" style={{marginTop: '15px'}} onClick={() => setScreen(playerName ? 'playerModes' : 'register')}>
+            <button className="btn-small" style={{marginTop: '15px', background: '#F88E00'}} onClick={() => setScreen(returnScreen)}>
               Back
             </button>
           </div>
         </div>
       );
 
-      // Player Modes Screen
+      // Player Modes Screen - UPDATED with exact player name display
       const PlayerModesScreen = () => (
         <div className="screen-frame">
           <div className="screen-container">
@@ -1482,11 +1515,11 @@
               <div className="input-row">
                 <div className="input-group">
                   <label className="label-cyan">Player Name:</label>
-                  <input type="text" className="input-field" value={playerName} readOnly />
+                  <input type="text" className="input-field" value={playerName || 'Mr Link-Logic'} readOnly />
                 </div>
                 <div className="input-group">
                   <label className="label-cyan">Rating</label>
-                  <input type="text" className="input-field" value={playerRating} readOnly />
+                  <input type="text" className="input-field" value={`${playerRating}    r`} readOnly />
                 </div>
               </div>
               
@@ -1511,7 +1544,10 @@
               </button>
               <div className="next-step">Next Step: Search Online</div>
               
-              <button className="btn-small" onClick={() => setScreen('instructions')}>
+              <button className="btn-small" onClick={() => {
+                setReturnScreen('playerModes');
+                setScreen('instructions');
+              }}>
                 Instructions
               </button>
             </div>
@@ -1519,12 +1555,12 @@
         </div>
       );
 
-      // Invite Players Screen
+      // Invite Players Screen - UPDATED: No "Coming Soon" section, copy button to right
       const InvitePlayersScreen = () => {
         const [copied, setCopied] = useState(false);
 
         const copyInvitation = () => {
-          const fullMessage = `${inviteMessage}\n\nRoom Number: ${roomCode}\nInstructions: Link Self Populated\nClick to Join: Link Self Populated`;
+          const fullMessage = `${inviteMessage}\n\nRoom Number: ${roomCode}\nInstructions: [Link to instructions]\nClick to Join: [Game link]`;
           navigator.clipboard.writeText(fullMessage).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -1548,25 +1584,27 @@
                 
                 <div className="section-title">Send an Invitation</div>
                 
-                <div className="invite-box">
-                  <label>Type your message here:</label>
-                  <textarea 
-                    value={inviteMessage}
-                    onChange={(e) => setInviteMessage(e.target.value)}
-                    placeholder="Enter your invitation message..."
-                  />
-                  <div style={{marginTop: '10px'}}>
-                    <div className="auto-text">Room Number:</div> {roomCode}<br/>
-                    <div className="auto-text">Instructions:</div> Link Self Populated<br/>
-                    <div className="auto-text">Click to Join:</div> Link Self Populated
+                <div className="invite-container">
+                  <div className="invite-box">
+                    <label>Type your message here:</label>
+                    <textarea 
+                      value={inviteMessage}
+                      onChange={(e) => setInviteMessage(e.target.value)}
+                      placeholder="Enter your invitation message..."
+                    />
+                    <div className="invite-text">
+                      <span className="auto-text">Room Number:</span> {roomCode}<br/>
+                      <span className="auto-text">Instructions:</span> [Link]<br/>
+                      <span className="auto-text">Click to Join:</span> [Link]
+                    </div>
                   </div>
-                </div>
-                
-                <div className="copy-btn-wrapper">
-                  <button className="copy-icon" onClick={copyInvitation}>
-                    {copied ? '✓' : '📋'}
-                  </button>
-                  <div className="copy-label">Copy &<br/>Text</div>
+                  
+                  <div className="copy-btn-vertical">
+                    <button className="copy-icon" onClick={copyInvitation}>
+                      {copied ? '✓' : '📋'}
+                    </button>
+                    <div className="copy-label">Copy &<br/>Text</div>
+                  </div>
                 </div>
                 
                 <button className="btn-host" onClick={() => setScreen('presets')}>
@@ -1575,22 +1613,13 @@
                 
                 <div className="coming-soon-title">Coming Soon</div>
                 <div className="coming-soon-subtitle">(auto texting)</div>
-                
-                <div className="contacts-table">
-                  <div className="contacts-table-header">
+                <div className="coming-soon-placeholder">
+                  <div className="placeholder-row">
                     <div>Players</div>
                     <div>Response</div>
                     <div>Select</div>
                     <div>Contacts</div>
                   </div>
-                  {['Jerisi5', 'Matthew578', 'DustDust22', 'Larna9223'].map((player, idx) => (
-                    <div key={idx} className="contacts-table-row">
-                      <div>{player}</div>
-                      <div>{idx % 2 === 0 ? 'Yes' : ''}</div>
-                      <div>X</div>
-                      <div><div className="contact-icon"></div></div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -1598,7 +1627,7 @@
         );
       };
 
-      // Presets Screen
+      // Presets Screen - UPDATED: New heading format, white lettering
       const PresetsScreen = () => {
         return (
           <div className="screen-frame">
@@ -1626,7 +1655,7 @@
                 </div>
                 
                 <div className="preset-info-box">
-                  <h3>{presetConfig.name} Settings:</h3>
+                  <h3>Preset {selectedPreset} Settings:</h3>
                   <div className="subtitle">{presetConfig.level}</div>
                   
                   <div className="preset-details">
@@ -1652,7 +1681,7 @@
         );
       };
 
-      // Host Room Screen
+      // Host Room Screen - UPDATED: Red, Yellow, Green countdown
       const HostRoomScreen = () => {
         const [countdownActive, setCountdownActive] = useState(false);
         const [countdownStep, setCountdownStep] = useState(0);
@@ -1679,9 +1708,10 @@
               
               <div className="game-preview">
                 <div className="word-grid">
-                  {Array(12).fill(null).map((_, idx) => (
-                    <div key={idx} className={`word-box ${[1, 8].includes(idx) ? 'bonus' : ''}`}>
-                      {[1, 8].includes(idx) ? 'Bonus Words' : 'Random Words'}
+                  {['Random Words', 'Bonus Words', 'Random Words', 'Random Words', 'Random Words', 'Random Words',
+                    'Random Words', 'Random Words', 'Bonus Words', 'Random Words', 'Random Words', 'Random Words'].map((word, idx) => (
+                    <div key={idx} className={`word-box ${word === 'Bonus Words' ? 'bonus' : ''}`}>
+                      {word}
                     </div>
                   ))}
                 </div>
@@ -1705,9 +1735,9 @@
                 </div>
                 
                 <div className="traffic-lights">
-                  <div className={`traffic-light ${countdownStep >= 1 ? 'active' : ''}`}>Read</div>
-                  <div className={`traffic-light ${countdownStep >= 2 ? 'active' : ''}`}>Set</div>
-                  <div className={`traffic-light ${countdownStep >= 3 ? 'active' : ''}`}>Go</div>
+                  <div className={`traffic-light ${countdownStep >= 1 ? 'active-red' : ''}`}>Read</div>
+                  <div className={`traffic-light ${countdownStep >= 2 ? 'active-yellow' : ''}`}>Set</div>
+                  <div className={`traffic-light ${countdownStep >= 3 ? 'active-green' : ''}`}>Go</div>
                 </div>
                 
                 <div className="players-ready-box">
@@ -1728,7 +1758,7 @@
         );
       };
 
-      // Waiting Room Screen
+      // Waiting Room Screen - UPDATED: Red, Yellow, Green countdown
       const WaitingRoomScreen = () => {
         return (
           <div className="screen-frame">
@@ -1739,9 +1769,10 @@
               
               <div className="game-preview">
                 <div className="word-grid">
-                  {Array(12).fill(null).map((_, idx) => (
-                    <div key={idx} className={`word-box ${[1, 8].includes(idx) ? 'bonus' : ''}`}>
-                      {[1, 8].includes(idx) ? 'Bonus Words' : 'Random Words'}
+                  {['Random Words', 'Bonus Words', 'Random Words', 'Random Words', 'Random Words', 'Random Words',
+                    'Random Words', 'Random Words', 'Bonus Words', 'Random Words', 'Random Words', 'Random Words'].map((word, idx) => (
+                    <div key={idx} className={`word-box ${word === 'Bonus Words' ? 'bonus' : ''}`}>
+                      {word}
                     </div>
                   ))}
                 </div>
@@ -1879,7 +1910,7 @@
                 <div className="keyboard">
                   {['Q','W','E','R','T','Y','U','I','O','P',
                     'A','S','D','F','G','H','J','K','L','⌫',
-                    'Z','X','C','V','B','N','M','!','?','↵'].map((key, idx) => (
+                    'Z','X','C','V','B','N','M','I','?','↵'].map((key, idx) => (
                     <div 
                       key={idx}
                       className={`key ${key === '↵' ? 'key-wide' : ''}`}
@@ -1902,7 +1933,7 @@
         );
       };
 
-      // Scoring Screen
+      // Scoring Screen - UPDATED: Player names left-aligned and smaller, thumbs up icon
       const ScoringScreen = () => {
         return (
           <div className="screen-frame">
@@ -1914,25 +1945,28 @@
               <div className="content-box">
                 <div className="round-complete">ROUND {currentRound} COMPLETE</div>
                 
-                {[playerName, 'Player2', 'Player3'].map((player, playerIdx) => (
+                {[{name: playerName || 'Mr Link-Logic', submissions: submissions}, 
+                  {name: 'Player2', submissions: [{words: 'BRANCH - CLAY - BLOCK', linkWord: 'BUILD', points: 5}]},
+                  {name: 'Player3', submissions: [{words: 'BRANCH - CLAY - BLOCK', linkWord: 'BUILD', points: 5}]}
+                ].map((player, playerIdx) => (
                   <div key={playerIdx} className="player-table">
-                    <div className="player-name-header">{player}</div>
+                    <div className="player-name-header">{player.name}</div>
                     <div className="table-content">
                       <div className="table-header">
                         <div>#</div>
                         <div>Words</div>
-                        <div>Link Word</div>
+                        <div>Link<br/>Word</div>
                         <div>Challenge</div>
                         <div>Like</div>
                         <div>Points</div>
                       </div>
-                      {(playerIdx === 0 ? submissions : [{words: 'BRANCH - CLAY - BLOCK', linkWord: 'BUILD', points: 5}]).map((sub, idx) => (
+                      {player.submissions.map((sub, idx) => (
                         <div key={idx} className="table-row">
                           <div>{idx + 1}.</div>
                           <div>{sub.words}</div>
                           <div className="link-word">{sub.linkWord}</div>
                           <div><button className="icon-btn">?</button></div>
-                          <div><button className="icon-btn like">🔥</button></div>
+                          <div><button className="icon-btn like">👍</button></div>
                           <div className="points">{sub.points}pt</div>
                         </div>
                       ))}
@@ -1962,7 +1996,7 @@
         );
       };
 
-      // Winner Screen
+      // Winner Screen - UPDATED: Trophy image, Final Standings centered
       const WinnerScreen = () => {
         return (
           <div className="screen-frame">
@@ -1974,10 +2008,18 @@
               <div className="content-box">
                 <div className="winner-title">Winner</div>
                 
-                <div className="trophy">🏆</div>
+                <div className="trophy">
+                  <img 
+                    src={TROPHY_IMG} 
+                    alt="Trophy" 
+                    onError={(e) => {
+                      e.target.parentElement.innerHTML = '🏆';
+                    }}
+                  />
+                </div>
                 
                 <div className="winner-name-box">
-                  Player Name - {playerName}
+                  Player Name - {playerName || 'Mr Link-Logic'}
                 </div>
                 
                 <div className="standings-table">
@@ -1990,12 +2032,16 @@
                     <div>Total<br/>points</div>
                   </div>
                   
-                  {[playerName, 'Player2', 'Player3'].map((player, idx) => (
+                  {[
+                    {name: playerName || 'Mr Link-Logic', round: 25, bonus: 5, total: 30},
+                    {name: 'Player2', round: 20, bonus: 4, total: 24},
+                    {name: 'Player3', round: 15, bonus: 3, total: 18}
+                  ].map((player, idx) => (
                     <div key={idx} className="table-row-standings">
-                      <div>{player}</div>
-                      <div>{25 - idx * 5}</div>
-                      <div>{5 - idx}</div>
-                      <div>{30 - idx * 6}</div>
+                      <div>{player.name}</div>
+                      <div>{player.round}</div>
+                      <div>{player.bonus}</div>
+                      <div>{player.total}</div>
                     </div>
                   ))}
                 </div>
