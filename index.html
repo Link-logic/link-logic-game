@@ -1181,17 +1181,17 @@
                'CONFLICT', 'RESOLUTION', 'COMPROMISE', 'NEGOTIATION', 'AGREEMENT', 'COOPERATION']
     };
 
-    // Preset configurations
+    // Preset configurations - FROM EXCEL FILE
     const PRESETS = {
-      1: { name: 'Preset 1', level: 'Easy - Building Skills', words: 18, timer: 20, rounds: 5, bonusWords: 3, difficulty: 'training' },
-      2: { name: 'Preset 2', level: 'Easy', words: 20, timer: 25, rounds: 5, bonusWords: 3, difficulty: 'children' },
-      3: { name: 'Preset 3', level: 'Medium', words: 24, timer: 20, rounds: 6, bonusWords: 4, difficulty: 'children' },
-      4: { name: 'Preset 4', level: 'Medium', words: 28, timer: 25, rounds: 6, bonusWords: 4, difficulty: 'beginners' },
-      5: { name: 'Preset 5', level: 'Medium-Hard', words: 32, timer: 20, rounds: 7, bonusWords: 5, difficulty: 'beginners' },
-      6: { name: 'Preset 6', level: 'Hard', words: 36, timer: 25, rounds: 7, bonusWords: 5, difficulty: 'beginners' },
-      7: { name: 'Preset 7', level: 'Hard', words: 40, timer: 20, rounds: 8, bonusWords: 6, difficulty: 'adults' },
-      8: { name: 'Preset 8', level: 'Very Hard', words: 44, timer: 25, rounds: 8, bonusWords: 6, difficulty: 'adults' },
-      9: { name: 'Preset 9', level: 'Expert', words: 48, timer: 30, rounds: 10, bonusWords: 7, difficulty: 'adults' }
+      1: { name: 'Preset 1', level: 'Easy', words: 22, timer: 120, rounds: 5, bonusWords: 5, difficulty: 'training' },
+      2: { name: 'Preset 2', level: 'Easy', words: 20, timer: 110, rounds: 5, bonusWords: 4, difficulty: 'children' },
+      3: { name: 'Preset 3', level: 'Easy', words: 18, timer: 100, rounds: 5, bonusWords: 3, difficulty: 'children' },
+      4: { name: 'Preset 4', level: 'Medium', words: 20, timer: 110, rounds: 5, bonusWords: 4, difficulty: 'beginners' },
+      5: { name: 'Preset 5', level: 'Medium', words: 18, timer: 100, rounds: 5, bonusWords: 3, difficulty: 'beginners' },
+      6: { name: 'Preset 6', level: 'Medium', words: 16, timer: 90, rounds: 5, bonusWords: 2, difficulty: 'beginners' },
+      7: { name: 'Preset 7', level: 'Difficult', words: 18, timer: 100, rounds: 5, bonusWords: 3, difficulty: 'adults' },
+      8: { name: 'Preset 8', level: 'Difficult', words: 16, timer: 90, rounds: 5, bonusWords: 2, difficulty: 'adults' },
+      9: { name: 'Preset 9', level: 'Difficult', words: 14, timer: 80, rounds: 5, bonusWords: 1, difficulty: 'adults' }
     };
 
     // Utility functions
@@ -1319,6 +1319,77 @@
           oscillator.start(audioContext.currentTime);
           oscillator.stop(audioContext.currentTime + 0.2);
         }
+      };
+
+      // Firebase Room Management Functions
+      const createRoom = async (roomCode, hostName, preset) => {
+        try {
+          const roomRef = database.ref(`rooms/${roomCode}`);
+          const words = generateWords(preset.difficulty, preset.words, preset.bonusWords);
+          
+          await roomRef.set({
+            host: hostName,
+            preset: preset,
+            players: {
+              [hostName]: {
+                name: hostName,
+                rating: playerRating,
+                isHost: true,
+                ready: false,
+                joinedAt: Date.now()
+              }
+            },
+            gameState: 'waiting', // waiting, countdown, playing, scoring, finished
+            currentRound: 1,
+            words: words,
+            submissions: {},
+            createdAt: Date.now()
+          });
+          
+          console.log(`Room ${roomCode} created by ${hostName}`);
+          return true;
+        } catch (error) {
+          console.error('Error creating room:', error);
+          return false;
+        }
+      };
+
+      const joinRoom = async (roomCode, playerName) => {
+        try {
+          const roomRef = database.ref(`rooms/${roomCode}`);
+          const snapshot = await roomRef.once('value');
+          
+          if (!snapshot.exists()) {
+            alert('Room not found. Please check the room number.');
+            return false;
+          }
+          
+          const playersRef = roomRef.child('players').child(playerName);
+          await playersRef.set({
+            name: playerName,
+            rating: playerRating,
+            isHost: false,
+            ready: true,
+            joinedAt: Date.now()
+          });
+          
+          console.log(`${playerName} joined room ${roomCode}`);
+          return true;
+        } catch (error) {
+          console.error('Error joining room:', error);
+          alert('Failed to join room. Please try again.');
+          return false;
+        }
+      };
+
+      const listenToRoom = (roomCode, callback) => {
+        const roomRef = database.ref(`rooms/${roomCode}`);
+        roomRef.on('value', (snapshot) => {
+          if (snapshot.exists()) {
+            callback(snapshot.val());
+          }
+        });
+        return () => roomRef.off();
       };
 
       // Challenge Popup Component
@@ -1670,18 +1741,35 @@
         </div>
       );
 
-      // Player Modes Screen - UPDATED with Room # input for joining
+      // Player Modes Screen - UPDATED with Room # input for joining + Firebase
       const PlayerModesScreen = () => {
         const [joinRoomCode, setJoinRoomCode] = useState('');
 
-        const handleJoinGame = () => {
-          if (!joinRoomCode || joinRoomCode.length < 6) {
+        // Check for room code in URL on mount
+        useEffect(() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const urlRoomCode = urlParams.get('room');
+          if (urlRoomCode && playerName) {
+            setJoinRoomCode(urlRoomCode);
+            // Auto-join if coming from invitation link
+            setTimeout(() => {
+              handleJoinGame(urlRoomCode);
+            }, 1000);
+          }
+        }, []);
+
+        const handleJoinGame = async (code = joinRoomCode) => {
+          const roomCodeToJoin = code.toUpperCase().trim();
+          if (!roomCodeToJoin || roomCodeToJoin.length < 6) {
             alert('Please enter a valid 6-character Room Number');
             return;
           }
-          // TODO: Validate room exists in Firebase
-          setRoomCode(joinRoomCode.toUpperCase());
-          setScreen('waitingRoom');
+          
+          const joined = await joinRoom(roomCodeToJoin, playerName || 'Player');
+          if (joined) {
+            setRoomCode(roomCodeToJoin);
+            setScreen('waitingRoom');
+          }
         };
 
         return (
@@ -1764,12 +1852,24 @@
         );
       };
 
-      // Invite Players Screen - UPDATED: No "Coming Soon" section, copy button to right
+      // Invite Players Screen - UPDATED: Creates Firebase room
       const InvitePlayersScreen = () => {
         const [copied, setCopied] = useState(false);
+        const [roomCreated, setRoomCreated] = useState(false);
+
+        // Create room on mount
+        useEffect(() => {
+          if (roomCode && !roomCreated) {
+            createRoom(roomCode, playerName || 'Host', presetConfig).then(() => {
+              setRoomCreated(true);
+              console.log('Firebase room created successfully');
+            });
+          }
+        }, [roomCode]);
 
         const copyInvitation = () => {
-          const fullMessage = `${inviteMessage}\n\nRoom Number: ${roomCode}\nInstructions: [Link to instructions]\nClick to Join: [Game link]`;
+          const gameUrl = window.location.href.split('?')[0] + `?room=${roomCode}`;
+          const fullMessage = `${inviteMessage}\n\nRoom Number: ${roomCode}\nInstructions: https://link-logic.github.io/link-logic-game/\nClick to Join: ${gameUrl}`;
           navigator.clipboard.writeText(fullMessage).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -1985,18 +2085,45 @@
         );
       };
 
-      // Host Room Screen - UPDATED: Red, Yellow, Green countdown
+      // Host Room Screen - UPDATED: Firebase sync for game start
       const HostRoomScreen = () => {
         const [countdownActive, setCountdownActive] = useState(false);
         const [countdownStep, setCountdownStep] = useState(0);
+        const [playersInRoom, setPlayersInRoom] = useState([]);
 
-        const startCountdown = () => {
+        useEffect(() => {
+          if (!roomCode) return;
+
+          const unsubscribe = listenToRoom(roomCode, (data) => {
+            if (data.players) {
+              const playerList = Object.values(data.players).map(p => p.name);
+              setPlayersInRoom(playerList);
+              setPlayersReady(playerList);
+            }
+          });
+
+          return unsubscribe;
+        }, [roomCode]);
+
+        const startCountdown = async () => {
           setCountdownActive(true);
           setCountdownStep(1);
           setTimeout(() => setCountdownStep(2), 1500);
           setTimeout(() => setCountdownStep(3), 3000);
-          setTimeout(() => {
-            const words = generateWords(presetConfig.difficulty, 12, 3);
+          
+          // Generate words and update Firebase
+          const words = generateWords(presetConfig.difficulty, presetConfig.words, presetConfig.bonusWords);
+          
+          setTimeout(async () => {
+            // Update Firebase to start the game for all players
+            const roomRef = database.ref(`rooms/${roomCode}`);
+            await roomRef.update({
+              gameState: 'playing',
+              words: words,
+              currentRound: 1,
+              startedAt: Date.now()
+            });
+            
             setGameWords(words);
             setTimeLeft(presetConfig.timer);
             setScreen('gameplay');
@@ -2009,6 +2136,26 @@
               <img src={LOGO_SMALL} alt="Link Logic" className="logo-small" onError={(e) => e.target.style.display = 'none'} />
               
               <h1 className="page-title-small">Host Room</h1>
+              
+              {roomCode && (
+                <div style={{
+                  background: '#7B2CBF',
+                  borderRadius: '12px',
+                  padding: '10px 15px',
+                  marginBottom: '15px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{color: '#00B0F0', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px'}}>
+                    Room Number:
+                  </div>
+                  <div style={{color: '#fff', fontSize: '24px', fontWeight: 'bold', letterSpacing: '2px'}}>
+                    {roomCode}
+                  </div>
+                  <div style={{color: '#F88E00', fontSize: '12px', marginTop: '5px'}}>
+                    {playersInRoom.length} player{playersInRoom.length !== 1 ? 's' : ''} ready
+                  </div>
+                </div>
+              )}
               
               <div className="game-preview">
                 <div className="word-grid">
@@ -2023,11 +2170,11 @@
                 <div className="input-row">
                   <div className="input-group">
                     <div className="input-label">Selected Words</div>
-                    <input type="text" className="input-box" value="Self Propagates" readOnly />
+                    <input type="text" className="input-box" value="Preview" readOnly />
                   </div>
                   <div className="input-group">
                     <div className="input-label">Link Word</div>
-                    <input type="text" className="input-box" placeholder="Enter" readOnly />
+                    <input type="text" className="input-box" placeholder="Ready!" readOnly />
                   </div>
                 </div>
               </div>
@@ -2048,11 +2195,18 @@
                   <div className="players-ready-title">Players Ready</div>
                   
                   <div className="player-grid">
-                    {playersReady.map((player, idx) => (
-                      <div key={idx} className="player-box">{player}</div>
+                    {playersInRoom.map((player, idx) => (
+                      <div key={idx} className="player-box" style={{
+                        background: '#fff',
+                        border: '3px solid #4CAF50'
+                      }}>
+                        {player}
+                      </div>
                     ))}
-                    {Array(6 - playersReady.length).fill(null).map((_, idx) => (
-                      <div key={`empty-${idx}`} className="player-box">-</div>
+                    {Array(Math.max(0, 6 - playersInRoom.length)).fill(null).map((_, idx) => (
+                      <div key={`empty-${idx}`} className="player-box">
+                        Waiting...
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -2062,8 +2216,34 @@
         );
       };
 
-      // Waiting Room Screen - UPDATED: Red, Yellow, Green countdown + Room Code display
+      // Waiting Room Screen - UPDATED: Firebase sync for real players
       const WaitingRoomScreen = () => {
+        const [roomData, setRoomData] = useState(null);
+        const [playersInRoom, setPlayersInRoom] = useState([]);
+
+        useEffect(() => {
+          if (!roomCode) return;
+
+          const unsubscribe = listenToRoom(roomCode, (data) => {
+            setRoomData(data);
+            if (data.players) {
+              const playerList = Object.values(data.players).map(p => p.name);
+              setPlayersInRoom(playerList);
+              setPlayersReady(playerList);
+            }
+            
+            // If game starts, load the words and go to gameplay
+            if (data.gameState === 'playing') {
+              setGameWords(data.words);
+              setTimeLeft(data.preset.timer);
+              setCurrentRound(data.currentRound);
+              setScreen('gameplay');
+            }
+          });
+
+          return unsubscribe;
+        }, [roomCode]);
+
         return (
           <div className="screen-frame">
             <div className="screen-container">
@@ -2085,6 +2265,9 @@
                   <div style={{color: '#fff', fontSize: '24px', fontWeight: 'bold', letterSpacing: '2px'}}>
                     {roomCode}
                   </div>
+                  <div style={{color: '#F88E00', fontSize: '12px', marginTop: '5px'}}>
+                    {playersInRoom.length} player{playersInRoom.length !== 1 ? 's' : ''} connected
+                  </div>
                 </div>
               )}
               
@@ -2101,17 +2284,17 @@
                 <div className="input-row">
                   <div className="input-group">
                     <div className="input-label">Selected Words</div>
-                    <input type="text" className="input-box" value="Self Propagates" readOnly />
+                    <input type="text" className="input-box" value="Tutorial Preview" readOnly />
                   </div>
                   <div className="input-group">
                     <div className="input-label">Link Word</div>
-                    <input type="text" className="input-box" placeholder="Enter" readOnly />
+                    <input type="text" className="input-box" placeholder="Waiting..." readOnly />
                   </div>
                 </div>
               </div>
               
               <div className="controls-box">
-                <button className="btn-waiting">Waiting</button>
+                <button className="btn-waiting">Waiting for Host...</button>
                 
                 <div className="traffic-lights">
                   <div className="traffic-light">Read</div>
@@ -2123,11 +2306,18 @@
                   <div className="players-ready-title">Players Ready</div>
                   
                   <div className="player-grid">
-                    {playersReady.map((player, idx) => (
-                      <div key={idx} className="player-box">{player}</div>
+                    {playersInRoom.map((player, idx) => (
+                      <div key={idx} className="player-box" style={{
+                        background: '#fff',
+                        border: '3px solid #4CAF50'
+                      }}>
+                        {player}
+                      </div>
                     ))}
-                    {Array(6 - playersReady.length).fill(null).map((_, idx) => (
-                      <div key={`empty-${idx}`} className="player-box">-</div>
+                    {Array(Math.max(0, 6 - playersInRoom.length)).fill(null).map((_, idx) => (
+                      <div key={`empty-${idx}`} className="player-box">
+                        Waiting...
+                      </div>
                     ))}
                   </div>
                 </div>
