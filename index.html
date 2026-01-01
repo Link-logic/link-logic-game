@@ -1257,6 +1257,9 @@
       const [inviteMessage, setInviteMessage] = useState('');
       const [submissions, setSubmissions] = useState([]);
       const [returnScreen, setReturnScreen] = useState('register');  // Track where to return from instructions
+      const [challengePopup, setChallengePopup] = useState(null);
+      const [likedSubmissions, setLikedSubmissions] = useState({});
+      const [challengedSubmissions, setChallengedSubmissions] = useState({});
       
       // Check if player is registered
       useEffect(() => {
@@ -1277,6 +1280,172 @@
           setScreen('scoring');
         }
       }, [screen, timeLeft]);
+
+      // Sound effects function
+      const playSound = (type) => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        if (type === 'like') {
+          // Happy ascending tone
+          oscillator.frequency.value = 523.25; // C5
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+          
+          // Add second tone
+          setTimeout(() => {
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.frequency.value = 659.25; // E5
+            gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            osc2.start(audioContext.currentTime);
+            osc2.stop(audioContext.currentTime + 0.3);
+          }, 100);
+        } else if (type === 'challenge') {
+          // Alert tone
+          oscillator.frequency.value = 440; // A4
+          oscillator.type = 'square';
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.2);
+        }
+      };
+
+      // Challenge Popup Component
+      const ChallengePopup = ({ playerName, submission, submissionKey, onClose }) => {
+        const [defense, setDefense] = useState('');
+
+        const handleSubmitDefense = () => {
+          console.log(`Defense submitted for ${submissionKey}:`, defense);
+          // Mark as challenged
+          setChallengedSubmissions({
+            ...challengedSubmissions,
+            [submissionKey]: { defense, status: 'defended' }
+          });
+          onClose();
+        };
+
+        return (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}>
+            <div style={{
+              background: '#7B2CBF',
+              borderRadius: '20px',
+              padding: '30px 25px',
+              maxWidth: '450px',
+              width: '100%',
+              border: '4px solid #F31418'
+            }}>
+              <h2 style={{
+                color: '#F88E00',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                marginBottom: '20px'
+              }}>Challenge Defense</h2>
+              
+              <div style={{
+                background: '#fff',
+                borderRadius: '12px',
+                padding: '15px',
+                marginBottom: '20px',
+                color: '#000'
+              }}>
+                <div style={{marginBottom: '10px'}}>
+                  <strong>Player:</strong> {playerName}
+                </div>
+                <div style={{marginBottom: '10px'}}>
+                  <strong>Words:</strong> {submission.words}
+                </div>
+                <div>
+                  <strong>Link Word:</strong> <span style={{color: '#00B0F0', fontWeight: 'bold'}}>{submission.linkWord}</span>
+                </div>
+              </div>
+              
+              <div style={{marginBottom: '20px'}}>
+                <label style={{
+                  color: '#fff',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  display: 'block',
+                  marginBottom: '10px'
+                }}>Your Defense:</label>
+                <textarea
+                  value={defense}
+                  onChange={(e) => setDefense(e.target.value)}
+                  placeholder="Type your defense here..."
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '2px solid #00B0F0',
+                    fontSize: '14px',
+                    fontFamily: 'Arial, sans-serif',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+              
+              <div style={{display: 'flex', gap: '10px'}}>
+                <button
+                  onClick={handleSubmitDefense}
+                  style={{
+                    flex: 1,
+                    padding: '15px',
+                    borderRadius: '12px',
+                    background: '#00B0F0',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Submit Defense
+                </button>
+                <button
+                  onClick={onClose}
+                  style={{
+                    flex: 1,
+                    padding: '15px',
+                    borderRadius: '12px',
+                    background: '#C0C0C0',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      };
 
       // Welcome Screen
       const WelcomeScreen = () => (
@@ -1627,8 +1796,41 @@
         );
       };
 
-      // Presets Screen - UPDATED: New heading format, white lettering
+      // Presets Screen - UPDATED: New heading format, white lettering, EDITABLE
       const PresetsScreen = () => {
+        const [isEditing, setIsEditing] = useState(false);
+        const [editedConfig, setEditedConfig] = useState({...presetConfig});
+
+        // Update editedConfig when preset changes
+        useEffect(() => {
+          setEditedConfig({...presetConfig});
+          setIsEditing(false);
+        }, [selectedPreset]);
+
+        const handleEdit = () => {
+          setIsEditing(true);
+        };
+
+        const handleSave = () => {
+          setPresetConfig(editedConfig);
+          setIsEditing(false);
+        };
+
+        const handleReset = () => {
+          const original = PRESETS[selectedPreset];
+          setEditedConfig({...original});
+          setPresetConfig({...original});
+          setIsEditing(false);
+        };
+
+        const updateValue = (field, value) => {
+          const numValue = parseInt(value) || 0;
+          setEditedConfig({
+            ...editedConfig,
+            [field]: numValue
+          });
+        };
+
         return (
           <div className="screen-frame">
             <div className="screen-container">
@@ -1646,7 +1848,10 @@
                       className={`preset-btn preset-${num} ${selectedPreset === num ? 'selected' : ''}`}
                       onClick={() => {
                         setSelectedPreset(num);
-                        setPresetConfig(PRESETS[num]);
+                        const newConfig = PRESETS[num];
+                        setPresetConfig(newConfig);
+                        setEditedConfig({...newConfig});
+                        setIsEditing(false);
                       }}
                     >
                       Preset<br/>{num}
@@ -1656,20 +1861,79 @@
                 
                 <div className="preset-info-box">
                   <h3>Preset {selectedPreset} Settings:</h3>
-                  <div className="subtitle">{presetConfig.level}</div>
+                  <div className="subtitle">{editedConfig.level}</div>
                   
                   <div className="preset-details">
-                    <div><strong>Words:</strong> {presetConfig.words}</div>
-                    <div><strong>Timer:</strong> {presetConfig.timer}s</div>
-                    <div><strong>Rounds:</strong> {presetConfig.rounds}</div>
-                    <div><strong>Bonus Words:</strong> {presetConfig.bonusWords}</div>
+                    <div>
+                      <strong>Words:</strong>{' '}
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          value={editedConfig.words}
+                          onChange={(e) => updateValue('words', e.target.value)}
+                          style={{width: '60px', padding: '2px 5px', borderRadius: '4px', border: '2px solid #00B0F0'}}
+                        />
+                      ) : editedConfig.words}
+                    </div>
+                    <div>
+                      <strong>Timer:</strong>{' '}
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          value={editedConfig.timer}
+                          onChange={(e) => updateValue('timer', e.target.value)}
+                          style={{width: '60px', padding: '2px 5px', borderRadius: '4px', border: '2px solid #00B0F0'}}
+                        />
+                      ) : editedConfig.timer}s
+                    </div>
+                    <div>
+                      <strong>Rounds:</strong>{' '}
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          value={editedConfig.rounds}
+                          onChange={(e) => updateValue('rounds', e.target.value)}
+                          style={{width: '60px', padding: '2px 5px', borderRadius: '4px', border: '2px solid #00B0F0'}}
+                        />
+                      ) : editedConfig.rounds}
+                    </div>
+                    <div>
+                      <strong>Bonus Words:</strong>{' '}
+                      {isEditing ? (
+                        <input 
+                          type="number" 
+                          value={editedConfig.bonusWords}
+                          onChange={(e) => updateValue('bonusWords', e.target.value)}
+                          style={{width: '60px', padding: '2px 5px', borderRadius: '4px', border: '2px solid #00B0F0'}}
+                        />
+                      ) : editedConfig.bonusWords}
+                    </div>
                   </div>
                 </div>
                 
                 <div className="button-row-presets">
-                  <button className="btn-preset-control btn-cyan">Edit</button>
-                  <button className="btn-preset-control btn-orange">Save</button>
-                  <button className="btn-preset-control btn-red">Reset</button>
+                  <button 
+                    className="btn-preset-control btn-cyan" 
+                    onClick={handleEdit}
+                    disabled={isEditing}
+                    style={{opacity: isEditing ? 0.5 : 1, cursor: isEditing ? 'not-allowed' : 'pointer'}}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className="btn-preset-control btn-orange" 
+                    onClick={handleSave}
+                    disabled={!isEditing}
+                    style={{opacity: !isEditing ? 0.5 : 1, cursor: !isEditing ? 'not-allowed' : 'pointer'}}
+                  >
+                    Save
+                  </button>
+                  <button 
+                    className="btn-preset-control btn-red" 
+                    onClick={handleReset}
+                  >
+                    Reset
+                  </button>
                 </div>
                 
                 <button className="btn-large" onClick={() => setScreen('hostRoom')}>
@@ -1933,8 +2197,27 @@
         );
       };
 
-      // Scoring Screen - UPDATED: Player names left-aligned and smaller, thumbs up icon
+      // Scoring Screen - UPDATED: Player names left-aligned and smaller, thumbs up icon, WORKING CHALLENGE/LIKE
       const ScoringScreen = () => {
+        const handleChallenge = (playerName, submission, playerIdx, subIdx) => {
+          playSound('challenge');
+          const submissionKey = `${playerIdx}-${subIdx}`;
+          setChallengePopup({
+            playerName,
+            submission,
+            submissionKey
+          });
+        };
+
+        const handleLike = (playerIdx, subIdx) => {
+          playSound('like');
+          const submissionKey = `${playerIdx}-${subIdx}`;
+          setLikedSubmissions({
+            ...likedSubmissions,
+            [submissionKey]: true
+          });
+        };
+
         return (
           <div className="screen-frame">
             <div className="screen-container scrollable">
@@ -1947,7 +2230,7 @@
                 
                 {[{name: playerName || 'Mr Link-Logic', submissions: submissions}, 
                   {name: 'Player2', submissions: [{words: 'BRANCH - CLAY - BLOCK', linkWord: 'BUILD', points: 5}]},
-                  {name: 'Player3', submissions: [{words: 'BRANCH - CLAY - BLOCK', linkWord: 'BUILD', points: 5}]}
+                  {name: 'Player3', submissions: [{words: 'FIRE - WATER', linkWord: 'HOSE', points: 2}]}
                 ].map((player, playerIdx) => (
                   <div key={playerIdx} className="player-table">
                     <div className="player-name-header">{player.name}</div>
@@ -1960,16 +2243,46 @@
                         <div>Like</div>
                         <div>Points</div>
                       </div>
-                      {player.submissions.map((sub, idx) => (
-                        <div key={idx} className="table-row">
-                          <div>{idx + 1}.</div>
-                          <div>{sub.words}</div>
-                          <div className="link-word">{sub.linkWord}</div>
-                          <div><button className="icon-btn">?</button></div>
-                          <div><button className="icon-btn like">👍</button></div>
-                          <div className="points">{sub.points}pt</div>
-                        </div>
-                      ))}
+                      {player.submissions.map((sub, idx) => {
+                        const submissionKey = `${playerIdx}-${idx}`;
+                        const isLiked = likedSubmissions[submissionKey];
+                        const isChallenged = challengedSubmissions[submissionKey];
+                        
+                        return (
+                          <div key={idx} className="table-row">
+                            <div>{idx + 1}.</div>
+                            <div>{sub.words}</div>
+                            <div className="link-word">{sub.linkWord}</div>
+                            <div>
+                              <button 
+                                className="icon-btn" 
+                                onClick={() => handleChallenge(player.name, sub, playerIdx, idx)}
+                                style={{
+                                  background: isChallenged ? '#F31418' : '#00B0F0',
+                                  transform: isChallenged ? 'scale(1.1)' : 'scale(1)',
+                                  transition: 'all 0.3s'
+                                }}
+                              >
+                                {isChallenged ? '⚠' : '?'}
+                              </button>
+                            </div>
+                            <div>
+                              <button 
+                                className="icon-btn like" 
+                                onClick={() => handleLike(playerIdx, idx)}
+                                style={{
+                                  background: isLiked ? '#FFD700' : '#F88E00',
+                                  transform: isLiked ? 'scale(1.2)' : 'scale(1)',
+                                  transition: 'all 0.3s'
+                                }}
+                              >
+                                👍
+                              </button>
+                            </div>
+                            <div className="points">{sub.points}pt</div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -1982,6 +2295,8 @@
                       setGameWords(generateWords(presetConfig.difficulty, 12, 3));
                       setTimeLeft(presetConfig.timer);
                       setSubmissions([]);
+                      setLikedSubmissions({});
+                      setChallengedSubmissions({});
                       setScreen('hostRoom');
                     } else {
                       setScreen('winner');
@@ -1991,6 +2306,16 @@
                   {currentRound < presetConfig.rounds ? 'Next Round' : 'See Winner'}
                 </button>
               </div>
+
+              {/* Challenge Popup */}
+              {challengePopup && (
+                <ChallengePopup
+                  playerName={challengePopup.playerName}
+                  submission={challengePopup.submission}
+                  submissionKey={challengePopup.submissionKey}
+                  onClose={() => setChallengePopup(null)}
+                />
+              )}
             </div>
           </div>
         );
