@@ -1413,9 +1413,10 @@
 
       // Challenge Popup Component - REDESIGNED
       const ChallengePopup = ({ playerName, submission, submissionKey, onClose }) => {
-        const [defense, setDefense] = useState('');
+        const defenseRef = useRef(null);
 
         const handleSubmitDefense = () => {
+          const defense = defenseRef.current?.value || '';
           console.log(`Defense submitted for ${submissionKey}:`, defense);
           // Mark as challenged
           setChallengedSubmissions({
@@ -1521,8 +1522,7 @@
                     textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
                   }}>Your Defense:</label>
                   <textarea
-                    defaultValue={defense}
-                    onInput={(e) => setDefense(e.target.value)}
+                    ref={defenseRef}
                     placeholder="Explain how your link word connects the selected words..."
                     style={{
                       width: '100%',
@@ -1925,6 +1925,7 @@
       const InvitePlayersScreen = () => {
         const [copied, setCopied] = useState(false);
         const [roomCreated, setRoomCreated] = useState(false);
+        const messageRef = useRef(null);
 
         // Create room on mount
         useEffect(() => {
@@ -1937,12 +1938,15 @@
         }, [roomCode]);
 
         const copyInvitation = () => {
+          const message = messageRef.current?.value || '';
           const gameUrl = window.location.href.split('?')[0] + `?room=${roomCode}`;
-          const fullMessage = `${inviteMessage}\n\nRoom Number: ${roomCode}\nInstructions: https://link-logic.github.io/link-logic-game/\nClick to Join: ${gameUrl}`;
+          const fullMessage = `${message}\n\nRoom Number: ${roomCode}\nInstructions: https://link-logic.github.io/link-logic-game/\nClick to Join: ${gameUrl}`;
           navigator.clipboard.writeText(fullMessage).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
           });
+          // Save the message
+          setInviteMessage(message);
         };
 
         return (
@@ -1966,8 +1970,8 @@
                   <div className="invite-box">
                     <label>Type your message here:</label>
                     <textarea 
+                      ref={messageRef}
                       defaultValue={inviteMessage}
-                      onInput={(e) => setInviteMessage(e.target.value)}
                       placeholder="Enter your invitation message..."
                     />
                     <div className="invite-text">
