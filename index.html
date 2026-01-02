@@ -1521,8 +1521,8 @@
                     textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
                   }}>Your Defense:</label>
                   <textarea
-                    value={defense}
-                    onChange={(e) => setDefense(e.target.value)}
+                    defaultValue={defense}
+                    onInput={(e) => setDefense(e.target.value)}
                     placeholder="Explain how your link word connects the selected words..."
                     style={{
                       width: '100%',
@@ -1613,47 +1613,34 @@
         </div>
       );
 
-      // Register Screen - ISOLATED to prevent re-render issues
+      // Register Screen - Simple version that works
       const RegisterScreen = () => {
-        // LOCAL state - doesn't trigger parent re-renders
-        const [localRegName, setLocalRegName] = useState(regName);
-        const [localRegCell, setLocalRegCell] = useState(regCell);
-        const [localRegEmail, setLocalRegEmail] = useState(regEmail);
-        const [localRegPlayerName, setLocalRegPlayerName] = useState(regPlayerName);
-        const [localPlayerNameAvailable, setLocalPlayerNameAvailable] = useState(playerNameAvailable);
-
         const checkAvailability = async () => {
-          if (localRegPlayerName.length < 3) {
-            setLocalPlayerNameAvailable(false);
+          if (regPlayerName.length < 3) {
+            setPlayerNameAvailable(false);
             return;
           }
-          const isAvailable = !['admin', 'test', 'user'].includes(localRegPlayerName.toLowerCase());
-          setLocalPlayerNameAvailable(isAvailable);
+          const isAvailable = !['admin', 'test', 'user'].includes(regPlayerName.toLowerCase());
+          setPlayerNameAvailable(isAvailable);
         };
 
         const handleRegister = () => {
-          if (!localRegName || !localRegCell || !localRegPlayerName || !localPlayerNameAvailable) {
+          if (!regName || !regCell || !regPlayerName || !playerNameAvailable) {
             alert('Please fill all required fields and choose an available player name');
             return;
           }
           
           const registration = {
-            name: localRegName,
-            cell: localRegCell,
-            email: localRegEmail,
-            playerName: localRegPlayerName,
+            name: regName,
+            cell: regCell,
+            email: regEmail,
+            playerName: regPlayerName,
             rating: 500,
             registeredAt: new Date().toISOString()
           };
           
           localStorage.setItem('linkLogicRegistration', JSON.stringify(registration));
-          
-          // Only update parent state when registering
-          setRegName(localRegName);
-          setRegCell(localRegCell);
-          setRegEmail(localRegEmail);
-          setRegPlayerName(localRegPlayerName);
-          setPlayerName(localRegPlayerName);
+          setPlayerName(regPlayerName);
           setPlayerRating(500);
           setScreen('playerModes');
         };
@@ -1671,9 +1658,8 @@
                   type="text" 
                   className="input-field" 
                   placeholder="Enter your full name"
-                  value={localRegName}
-                  onChange={(e) => setLocalRegName(e.target.value)}
-                  autoComplete="name"
+                  defaultValue={regName}
+                  onInput={(e) => setRegName(e.target.value)}
                 />
                 
                 <label className="label-orange">Your Cell*</label>
@@ -1681,9 +1667,8 @@
                   type="tel" 
                   className="input-field" 
                   placeholder="Enter your phone number"
-                  value={localRegCell}
-                  onChange={(e) => setLocalRegCell(e.target.value)}
-                  autoComplete="tel"
+                  defaultValue={regCell}
+                  onInput={(e) => setRegCell(e.target.value)}
                 />
                 
                 <label className="label-orange">Your Email</label>
@@ -1691,9 +1676,8 @@
                   type="email" 
                   className="input-field" 
                   placeholder="Enter your email"
-                  value={localRegEmail}
-                  onChange={(e) => setLocalRegEmail(e.target.value)}
-                  autoComplete="email"
+                  defaultValue={regEmail}
+                  onInput={(e) => setRegEmail(e.target.value)}
                 />
                 
                 <div className="required-text">* Required</div>
@@ -1704,20 +1688,19 @@
                   type="text" 
                   className="input-field input-gradient" 
                   placeholder="Type in a Player Name"
-                  value={localRegPlayerName}
-                  onChange={(e) => setLocalRegPlayerName(e.target.value)}
+                  defaultValue={regPlayerName}
+                  onInput={(e) => setRegPlayerName(e.target.value)}
                   onBlur={checkAvailability}
-                  autoComplete="off"
                 />
                 
                 <button className="btn btn-cyan" onClick={checkAvailability}>
                   Check for Availability
                 </button>
                 
-                {localPlayerNameAvailable === false && (
+                {playerNameAvailable === false && (
                   <button className="btn btn-gray">Not Available - Try Again</button>
                 )}
-                {localPlayerNameAvailable === true && (
+                {playerNameAvailable === true && (
                   <button className="btn btn-cyan" style={{background: '#4CAF50'}}>Available!</button>
                 )}
                 
@@ -1983,8 +1966,8 @@
                   <div className="invite-box">
                     <label>Type your message here:</label>
                     <textarea 
-                      value={inviteMessage}
-                      onChange={(e) => setInviteMessage(e.target.value)}
+                      defaultValue={inviteMessage}
+                      onInput={(e) => setInviteMessage(e.target.value)}
                       placeholder="Enter your invitation message..."
                     />
                     <div className="invite-text">
