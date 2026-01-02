@@ -114,21 +114,25 @@
 
     /* Timer Box */
     .timer-box {
-      background: #fff;
-      border: 3px solid #F31418;
-      border-radius: 8px;
-      padding: 6px 10px;
-      color: #F31418;
-      font-size: 18px;
+      background: linear-gradient(135deg, #F31418 0%, #C41014 100%);
+      border: 3px solid #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 24px;
       font-weight: bold;
       text-align: center;
       line-height: 1.2;
-      min-width: 60px;
+      min-width: 80px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .timer-label {
       font-size: 10px;
-      color: #F31418;
+      color: #fff;
+      font-weight: normal;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     /* Content Box - Purple Background Container */
@@ -213,6 +217,15 @@
       color: #000;
       font-size: 16px;
       margin-bottom: 15px;
+      -webkit-user-select: text;
+      user-select: text;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .input-field:focus {
+      outline: 2px solid #00B0F0;
+      background: #fff;
     }
 
     .input-field::placeholder {
@@ -910,7 +923,7 @@
 
     .table-header {
       display: grid;
-      grid-template-columns: 30px 2fr 1fr 60px 60px 60px;
+      grid-template-columns: 30px 2fr 1fr 60px 60px;
       padding: 8px 5px;
       font-weight: bold;
       font-size: 12px;
@@ -922,7 +935,7 @@
 
     .table-row {
       display: grid;
-      grid-template-columns: 30px 2fr 1fr 60px 60px 60px;
+      grid-template-columns: 30px 2fr 1fr 60px 60px;
       padding: 10px 5px;
       align-items: center;
       border-bottom: 1px solid #eee;
@@ -1007,7 +1020,7 @@
 
     .table-header-row {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr;
       padding: 10px;
       background: #F5F5F5;
       font-weight: bold;
@@ -1018,7 +1031,7 @@
 
     .table-row-standings {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      grid-template-columns: 1.5fr 1fr 1fr;
       padding: 10px;
       color: #666;
       font-size: 14px;
@@ -1258,7 +1271,6 @@
       const [submissions, setSubmissions] = useState([]);
       const [returnScreen, setReturnScreen] = useState('register');  // Track where to return from instructions
       const [challengePopup, setChallengePopup] = useState(null);
-      const [likedSubmissions, setLikedSubmissions] = useState({});
       const [challengedSubmissions, setChallengedSubmissions] = useState({});
       
       // Check if player is registered
@@ -1392,7 +1404,7 @@
         return () => roomRef.off();
       };
 
-      // Challenge Popup Component
+      // Challenge Popup Component - REDESIGNED
       const ChallengePopup = ({ playerName, submission, submissionKey, onClose }) => {
         const [defense, setDefense] = useState('');
 
@@ -1403,6 +1415,7 @@
             ...challengedSubmissions,
             [submissionKey]: { defense, status: 'defended' }
           });
+          playSound('like'); // Success sound
           onClose();
         };
 
@@ -1413,105 +1426,154 @@
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.8)',
+            background: 'rgba(0, 0, 0, 0.85)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px'
+            padding: '20px',
+            backdropFilter: 'blur(4px)'
           }}>
             <div style={{
-              background: '#7B2CBF',
-              borderRadius: '20px',
-              padding: '30px 25px',
-              maxWidth: '450px',
+              background: 'linear-gradient(135deg, #7B2CBF 0%, #5A1F8F 100%)',
+              borderRadius: '24px',
+              padding: '0',
+              maxWidth: '480px',
               width: '100%',
-              border: '4px solid #F31418'
+              border: '4px solid #F31418',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+              overflow: 'hidden'
             }}>
-              <h2 style={{
-                color: '#F88E00',
-                fontSize: '24px',
-                fontWeight: 'bold',
-                textAlign: 'center',
-                marginBottom: '20px'
-              }}>Challenge Defense</h2>
-              
+              {/* Header */}
               <div style={{
-                background: '#fff',
-                borderRadius: '12px',
-                padding: '15px',
-                marginBottom: '20px',
-                color: '#000'
+                background: 'linear-gradient(90deg, #F31418 0%, #C41014 100%)',
+                padding: '20px',
+                borderBottom: '3px solid #fff'
               }}>
-                <div style={{marginBottom: '10px'}}>
-                  <strong>Player:</strong> {playerName}
-                </div>
-                <div style={{marginBottom: '10px'}}>
-                  <strong>Words:</strong> {submission.words}
-                </div>
-                <div>
-                  <strong>Link Word:</strong> <span style={{color: '#00B0F0', fontWeight: 'bold'}}>{submission.linkWord}</span>
-                </div>
-              </div>
-              
-              <div style={{marginBottom: '20px'}}>
-                <label style={{
+                <h2 style={{
                   color: '#fff',
-                  fontSize: '16px',
+                  fontSize: '28px',
                   fontWeight: 'bold',
-                  display: 'block',
-                  marginBottom: '10px'
-                }}>Your Defense:</label>
-                <textarea
-                  value={defense}
-                  onChange={(e) => setDefense(e.target.value)}
-                  placeholder="Type your defense here..."
-                  style={{
-                    width: '100%',
-                    minHeight: '100px',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '2px solid #00B0F0',
-                    fontSize: '14px',
-                    fontFamily: 'Arial, sans-serif',
-                    resize: 'vertical'
-                  }}
-                />
+                  textAlign: 'center',
+                  margin: 0,
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+                }}>⚠️ Challenge Defense</h2>
               </div>
-              
-              <div style={{display: 'flex', gap: '10px'}}>
-                <button
-                  onClick={handleSubmitDefense}
-                  style={{
-                    flex: 1,
-                    padding: '15px',
-                    borderRadius: '12px',
-                    background: '#00B0F0',
-                    border: 'none',
-                    color: '#fff',
+
+              {/* Content */}
+              <div style={{padding: '25px'}}>
+                {/* Player Info Box */}
+                <div style={{
+                  background: '#fff',
+                  borderRadius: '12px',
+                  padding: '18px',
+                  marginBottom: '20px',
+                  color: '#000',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gap: '12px'
+                  }}>
+                    <div style={{
+                      borderBottom: '2px solid #ECECEC',
+                      paddingBottom: '10px'
+                    }}>
+                      <strong style={{color: '#7B2CBF', fontSize: '14px'}}>PLAYER:</strong>
+                      <div style={{fontSize: '18px', fontWeight: 'bold', marginTop: '4px'}}>{playerName}</div>
+                    </div>
+                    <div style={{
+                      borderBottom: '2px solid #ECECEC',
+                      paddingBottom: '10px'
+                    }}>
+                      <strong style={{color: '#7B2CBF', fontSize: '14px'}}>WORDS:</strong>
+                      <div style={{fontSize: '16px', marginTop: '4px'}}>{submission.words}</div>
+                    </div>
+                    <div>
+                      <strong style={{color: '#7B2CBF', fontSize: '14px'}}>LINK WORD:</strong>
+                      <div style={{
+                        color: '#00B0F0',
+                        fontWeight: 'bold',
+                        fontSize: '20px',
+                        marginTop: '4px',
+                        textTransform: 'uppercase'
+                      }}>{submission.linkWord}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Defense Input */}
+                <div style={{marginBottom: '20px'}}>
+                  <label style={{
+                    color: '#F88E00',
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Submit Defense
-                </button>
-                <button
-                  onClick={onClose}
-                  style={{
-                    flex: 1,
-                    padding: '15px',
-                    borderRadius: '12px',
-                    background: '#C0C0C0',
-                    border: 'none',
-                    color: '#fff',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
+                    display: 'block',
+                    marginBottom: '10px',
+                    textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                  }}>Your Defense:</label>
+                  <textarea
+                    value={defense}
+                    onChange={(e) => setDefense(e.target.value)}
+                    placeholder="Explain how your link word connects the selected words..."
+                    style={{
+                      width: '100%',
+                      minHeight: '100px',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '3px solid #00B0F0',
+                      fontSize: '15px',
+                      fontFamily: 'Arial, sans-serif',
+                      resize: 'vertical',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                  />
+                </div>
+                
+                {/* Buttons */}
+                <div style={{display: 'flex', gap: '12px'}}>
+                  <button
+                    onClick={handleSubmitDefense}
+                    style={{
+                      flex: 1,
+                      padding: '16px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #00B0F0 0%, #0088CC 100%)',
+                      border: 'none',
+                      color: '#fff',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0, 176, 240, 0.4)',
+                      transition: 'transform 0.1s'
+                    }}
+                    onMouseDown={(e) => e.target.style.transform = 'scale(0.98)'}
+                    onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
+                  >
+                    ✓ Submit Defense
+                  </button>
+                  <button
+                    onClick={onClose}
+                    style={{
+                      flex: 1,
+                      padding: '16px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #666 0%, #444 100%)',
+                      border: 'none',
+                      color: '#fff',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                      transition: 'transform 0.1s'
+                    }}
+                    onMouseDown={(e) => e.target.style.transform = 'scale(0.98)'}
+                    onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
+                  >
+                    × Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1591,6 +1653,7 @@
                   placeholder="Enter your full name"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
+                  autoComplete="name"
                 />
                 
                 <label className="label-orange">Your Cell*</label>
@@ -1600,6 +1663,7 @@
                   placeholder="Enter your phone number"
                   value={regCell}
                   onChange={(e) => setRegCell(e.target.value)}
+                  autoComplete="tel"
                 />
                 
                 <label className="label-orange">Your Email</label>
@@ -1609,6 +1673,7 @@
                   placeholder="Enter your email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
+                  autoComplete="email"
                 />
                 
                 <div className="required-text">* Required</div>
@@ -1622,6 +1687,7 @@
                   value={regPlayerName}
                   onChange={(e) => setRegPlayerName(e.target.value)}
                   onBlur={checkAvailability}
+                  autoComplete="off"
                 />
                 
                 <button className="btn btn-cyan" onClick={checkAvailability}>
@@ -2196,11 +2262,18 @@
                   
                   <div className="player-grid">
                     {playersInRoom.map((player, idx) => (
-                      <div key={idx} className="player-box" style={{
-                        background: '#fff',
-                        border: '3px solid #4CAF50'
-                      }}>
-                        {player}
+                      <div 
+                        key={idx} 
+                        className="player-box" 
+                        style={{
+                          background: idx === 0 ? 'linear-gradient(135deg, #F88E00 0%, #FF6600 100%)' : '#fff',
+                          border: idx === 0 ? '3px solid #F31418' : '3px solid #4CAF50',
+                          color: idx === 0 ? '#fff' : '#666',
+                          fontWeight: idx === 0 ? 'bold' : 'normal',
+                          boxShadow: idx === 0 ? '0 4px 8px rgba(248, 142, 0, 0.3)' : 'none'
+                        }}
+                      >
+                        {player} {idx === 0 && '👑'}
                       </div>
                     ))}
                     {Array(Math.max(0, 6 - playersInRoom.length)).fill(null).map((_, idx) => (
@@ -2307,11 +2380,18 @@
                   
                   <div className="player-grid">
                     {playersInRoom.map((player, idx) => (
-                      <div key={idx} className="player-box" style={{
-                        background: '#fff',
-                        border: '3px solid #4CAF50'
-                      }}>
-                        {player}
+                      <div 
+                        key={idx} 
+                        className="player-box" 
+                        style={{
+                          background: idx === 0 ? 'linear-gradient(135deg, #F88E00 0%, #FF6600 100%)' : '#fff',
+                          border: idx === 0 ? '3px solid #F31418' : '3px solid #4CAF50',
+                          color: idx === 0 ? '#fff' : '#666',
+                          fontWeight: idx === 0 ? 'bold' : 'normal',
+                          boxShadow: idx === 0 ? '0 4px 8px rgba(248, 142, 0, 0.3)' : 'none'
+                        }}
+                      >
+                        {player} {idx === 0 && '👑'}
                       </div>
                     ))}
                     {Array(Math.max(0, 6 - playersInRoom.length)).fill(null).map((_, idx) => (
@@ -2444,7 +2524,7 @@
         );
       };
 
-      // Scoring Screen - UPDATED: Player names left-aligned and smaller, thumbs up icon, WORKING CHALLENGE/LIKE
+      // Scoring Screen - UPDATED: No Like feature, improved Challenge popup
       const ScoringScreen = () => {
         const handleChallenge = (playerName, submission, playerIdx, subIdx) => {
           playSound('challenge');
@@ -2453,15 +2533,6 @@
             playerName,
             submission,
             submissionKey
-          });
-        };
-
-        const handleLike = (playerIdx, subIdx) => {
-          playSound('like');
-          const submissionKey = `${playerIdx}-${subIdx}`;
-          setLikedSubmissions({
-            ...likedSubmissions,
-            [submissionKey]: true
           });
         };
 
@@ -2487,7 +2558,6 @@
                         <div>Words</div>
                         <div>Link<br/>Word</div>
                         <div>Challenge</div>
-                        <div>Like</div>
                         <div>Points</div>
                       </div>
                       {player.submissions.map((sub, idx) => {
@@ -2513,19 +2583,6 @@
                                 {isChallenged ? '⚠' : '?'}
                               </button>
                             </div>
-                            <div>
-                              <button 
-                                className="icon-btn like" 
-                                onClick={() => handleLike(playerIdx, idx)}
-                                style={{
-                                  background: isLiked ? '#FFD700' : '#F88E00',
-                                  transform: isLiked ? 'scale(1.2)' : 'scale(1)',
-                                  transition: 'all 0.3s'
-                                }}
-                              >
-                                👍
-                              </button>
-                            </div>
                             <div className="points">{sub.points}pt</div>
                           </div>
                         );
@@ -2542,7 +2599,6 @@
                       setGameWords(generateWords(presetConfig.difficulty, 12, 3));
                       setTimeLeft(presetConfig.timer);
                       setSubmissions([]);
-                      setLikedSubmissions({});
                       setChallengedSubmissions({});
                       setScreen('hostRoom');
                     } else {
@@ -2600,19 +2656,17 @@
                   <div className="table-header-row">
                     <div>Player</div>
                     <div>Round<br/>Points</div>
-                    <div>Bonus<br/>Points</div>
                     <div>Total<br/>points</div>
                   </div>
                   
                   {[
-                    {name: playerName || 'Mr Link-Logic', round: 25, bonus: 5, total: 30},
-                    {name: 'Player2', round: 20, bonus: 4, total: 24},
-                    {name: 'Player3', round: 15, bonus: 3, total: 18}
+                    {name: playerName || 'Mr Link-Logic', round: 25, total: 30},
+                    {name: 'Player2', round: 20, total: 24},
+                    {name: 'Player3', round: 15, total: 18}
                   ].map((player, idx) => (
                     <div key={idx} className="table-row-standings">
                       <div>{player.name}</div>
                       <div>{player.round}</div>
-                      <div>{player.bonus}</div>
                       <div>{player.total}</div>
                     </div>
                   ))}
