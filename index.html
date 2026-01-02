@@ -1173,7 +1173,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect, useRef, useCallback } = React;
 
     // Firebase configuration
     const firebaseConfig = {
@@ -1615,16 +1615,16 @@
 
       // Register Screen
       const RegisterScreen = () => {
-        const checkAvailability = async () => {
+        const checkAvailability = useCallback(async () => {
           if (regPlayerName.length < 3) {
             setPlayerNameAvailable(false);
             return;
           }
           const isAvailable = !['admin', 'test', 'user'].includes(regPlayerName.toLowerCase());
           setPlayerNameAvailable(isAvailable);
-        };
+        }, [regPlayerName]);
 
-        const handleRegister = () => {
+        const handleRegister = useCallback(() => {
           if (!regName || !regCell || !regPlayerName || !playerNameAvailable) {
             alert('Please fill all required fields and choose an available player name');
             return;
@@ -1643,20 +1643,10 @@
           setPlayerName(regPlayerName);
           setPlayerRating(500);
           setScreen('playerModes');
-        };
-
-        const handleInputChange = (setter) => (e) => {
-          e.stopPropagation();
-          setter(e.target.value);
-        };
+        }, [regName, regCell, regEmail, regPlayerName, playerNameAvailable]);
 
         return (
-          <div className="screen-frame" onMouseDown={(e) => {
-            // Prevent any clicks outside inputs from stealing focus
-            if (e.target.tagName !== 'INPUT') {
-              e.preventDefault();
-            }
-          }}>
+          <div className="screen-frame">
             <div className="screen-container scrollable">
               <img src={LOGO_SMALL} alt="Link Logic" className="logo-small" onError={(e) => e.target.style.display = 'none'} />
               
@@ -1669,9 +1659,8 @@
                   className="input-field" 
                   placeholder="Enter your full name"
                   value={regName}
-                  onChange={handleInputChange(setRegName)}
+                  onChange={(e) => setRegName(e.target.value)}
                   autoComplete="name"
-                  inputMode="text"
                 />
                 
                 <label className="label-orange">Your Cell*</label>
@@ -1680,9 +1669,8 @@
                   className="input-field" 
                   placeholder="Enter your phone number"
                   value={regCell}
-                  onChange={handleInputChange(setRegCell)}
+                  onChange={(e) => setRegCell(e.target.value)}
                   autoComplete="tel"
-                  inputMode="tel"
                 />
                 
                 <label className="label-orange">Your Email</label>
@@ -1691,9 +1679,8 @@
                   className="input-field" 
                   placeholder="Enter your email"
                   value={regEmail}
-                  onChange={handleInputChange(setRegEmail)}
+                  onChange={(e) => setRegEmail(e.target.value)}
                   autoComplete="email"
-                  inputMode="email"
                 />
                 
                 <div className="required-text">* Required</div>
@@ -1705,10 +1692,9 @@
                   className="input-field input-gradient" 
                   placeholder="Type in a Player Name"
                   value={regPlayerName}
-                  onChange={handleInputChange(setRegPlayerName)}
+                  onChange={(e) => setRegPlayerName(e.target.value)}
                   onBlur={checkAvailability}
                   autoComplete="off"
-                  inputMode="text"
                 />
                 
                 <button className="btn btn-cyan" onClick={checkAvailability}>
