@@ -1613,37 +1613,50 @@
         </div>
       );
 
-      // Register Screen
+      // Register Screen - ISOLATED to prevent re-render issues
       const RegisterScreen = () => {
-        const checkAvailability = useCallback(async () => {
-          if (regPlayerName.length < 3) {
-            setPlayerNameAvailable(false);
+        // LOCAL state - doesn't trigger parent re-renders
+        const [localRegName, setLocalRegName] = useState(regName);
+        const [localRegCell, setLocalRegCell] = useState(regCell);
+        const [localRegEmail, setLocalRegEmail] = useState(regEmail);
+        const [localRegPlayerName, setLocalRegPlayerName] = useState(regPlayerName);
+        const [localPlayerNameAvailable, setLocalPlayerNameAvailable] = useState(playerNameAvailable);
+
+        const checkAvailability = async () => {
+          if (localRegPlayerName.length < 3) {
+            setLocalPlayerNameAvailable(false);
             return;
           }
-          const isAvailable = !['admin', 'test', 'user'].includes(regPlayerName.toLowerCase());
-          setPlayerNameAvailable(isAvailable);
-        }, [regPlayerName]);
+          const isAvailable = !['admin', 'test', 'user'].includes(localRegPlayerName.toLowerCase());
+          setLocalPlayerNameAvailable(isAvailable);
+        };
 
-        const handleRegister = useCallback(() => {
-          if (!regName || !regCell || !regPlayerName || !playerNameAvailable) {
+        const handleRegister = () => {
+          if (!localRegName || !localRegCell || !localRegPlayerName || !localPlayerNameAvailable) {
             alert('Please fill all required fields and choose an available player name');
             return;
           }
           
           const registration = {
-            name: regName,
-            cell: regCell,
-            email: regEmail,
-            playerName: regPlayerName,
+            name: localRegName,
+            cell: localRegCell,
+            email: localRegEmail,
+            playerName: localRegPlayerName,
             rating: 500,
             registeredAt: new Date().toISOString()
           };
           
           localStorage.setItem('linkLogicRegistration', JSON.stringify(registration));
-          setPlayerName(regPlayerName);
+          
+          // Only update parent state when registering
+          setRegName(localRegName);
+          setRegCell(localRegCell);
+          setRegEmail(localRegEmail);
+          setRegPlayerName(localRegPlayerName);
+          setPlayerName(localRegPlayerName);
           setPlayerRating(500);
           setScreen('playerModes');
-        }, [regName, regCell, regEmail, regPlayerName, playerNameAvailable]);
+        };
 
         return (
           <div className="screen-frame">
@@ -1658,8 +1671,8 @@
                   type="text" 
                   className="input-field" 
                   placeholder="Enter your full name"
-                  value={regName}
-                  onChange={(e) => setRegName(e.target.value)}
+                  value={localRegName}
+                  onChange={(e) => setLocalRegName(e.target.value)}
                   autoComplete="name"
                 />
                 
@@ -1668,8 +1681,8 @@
                   type="tel" 
                   className="input-field" 
                   placeholder="Enter your phone number"
-                  value={regCell}
-                  onChange={(e) => setRegCell(e.target.value)}
+                  value={localRegCell}
+                  onChange={(e) => setLocalRegCell(e.target.value)}
                   autoComplete="tel"
                 />
                 
@@ -1678,8 +1691,8 @@
                   type="email" 
                   className="input-field" 
                   placeholder="Enter your email"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
+                  value={localRegEmail}
+                  onChange={(e) => setLocalRegEmail(e.target.value)}
                   autoComplete="email"
                 />
                 
@@ -1691,8 +1704,8 @@
                   type="text" 
                   className="input-field input-gradient" 
                   placeholder="Type in a Player Name"
-                  value={regPlayerName}
-                  onChange={(e) => setRegPlayerName(e.target.value)}
+                  value={localRegPlayerName}
+                  onChange={(e) => setLocalRegPlayerName(e.target.value)}
                   onBlur={checkAvailability}
                   autoComplete="off"
                 />
@@ -1701,10 +1714,10 @@
                   Check for Availability
                 </button>
                 
-                {playerNameAvailable === false && (
+                {localPlayerNameAvailable === false && (
                   <button className="btn btn-gray">Not Available - Try Again</button>
                 )}
-                {playerNameAvailable === true && (
+                {localPlayerNameAvailable === true && (
                   <button className="btn btn-cyan" style={{background: '#4CAF50'}}>Available!</button>
                 )}
                 
