@@ -221,9 +221,16 @@
       user-select: text;
       -webkit-appearance: none;
       appearance: none;
+      pointer-events: auto;
+      touch-action: manipulation;
     }
 
     .input-field:focus {
+      outline: 2px solid #00B0F0;
+      background: #fff;
+    }
+
+    .input-field:active {
       outline: 2px solid #00B0F0;
       background: #fff;
     }
@@ -1608,6 +1615,11 @@
 
       // Register Screen
       const RegisterScreen = () => {
+        const nameInputRef = React.useRef(null);
+        const cellInputRef = React.useRef(null);
+        const emailInputRef = React.useRef(null);
+        const playerNameInputRef = React.useRef(null);
+
         const checkAvailability = async () => {
           if (regPlayerName.length < 3) {
             setPlayerNameAvailable(false);
@@ -1648,32 +1660,38 @@
               <div className="content-box">
                 <label className="label-orange">Your Name*</label>
                 <input 
+                  ref={nameInputRef}
                   type="text" 
                   className="input-field" 
                   placeholder="Enter your full name"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
                   autoComplete="name"
+                  inputMode="text"
                 />
                 
                 <label className="label-orange">Your Cell*</label>
                 <input 
+                  ref={cellInputRef}
                   type="tel" 
                   className="input-field" 
                   placeholder="Enter your phone number"
                   value={regCell}
                   onChange={(e) => setRegCell(e.target.value)}
                   autoComplete="tel"
+                  inputMode="tel"
                 />
                 
                 <label className="label-orange">Your Email</label>
                 <input 
+                  ref={emailInputRef}
                   type="email" 
                   className="input-field" 
                   placeholder="Enter your email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   autoComplete="email"
+                  inputMode="email"
                 />
                 
                 <div className="required-text">* Required</div>
@@ -1681,6 +1699,7 @@
                 <h2 className="heading-cyan">Create your Player Profile</h2>
                 
                 <input 
+                  ref={playerNameInputRef}
                   type="text" 
                   className="input-field input-gradient" 
                   placeholder="Type in a Player Name"
@@ -1688,6 +1707,7 @@
                   onChange={(e) => setRegPlayerName(e.target.value)}
                   onBlur={checkAvailability}
                   autoComplete="off"
+                  inputMode="text"
                 />
                 
                 <button className="btn btn-cyan" onClick={checkAvailability}>
