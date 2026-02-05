@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ref, set, get } from 'firebase/database';
 import { database } from '../config/firebase';
 import { presets } from '../data/presets';
+import ScreenFrame from '../components/ScreenFrame';
 
 function HostRoomScreen({ onNavigate, playerId, playerName }) {
   const [roomNumber, setRoomNumber] = useState('');
@@ -100,15 +101,8 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* Small Logo Banner */}
-        <div style={styles.banner}>
-          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
-        </div>
-
-        <h2 style={styles.title}>Host</h2>
-
+    <ScreenFrame title="Host Room">
+      <div style={styles.content}>
         {/* Game Setup Section */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Game Setup:</h3>
@@ -230,124 +224,97 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
           Waiting Room
         </button>
       </div>
-    </div>
+    </ScreenFrame>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#1a2332',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: '#2c4a6d',
-    borderRadius: '20px',
-    border: '3px solid #4a7ba7',
-    padding: '35px',
-    maxWidth: '650px',
+  content: {
     width: '100%',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-  },
-  banner: {
-    backgroundColor: '#8b2d8b',
-    padding: '12px',
-    borderRadius: '10px',
-    marginBottom: '25px',
-    textAlign: 'center',
-  },
-  logo: {
-    maxWidth: '110px',
-    height: 'auto',
-  },
-  title: {
-    color: '#ffffff',
-    fontSize: '32px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: '0 0 30px 0',
+    maxWidth: '480px',
   },
   section: {
-    marginBottom: '30px',
+    marginBottom: '25px',
   },
   sectionTitle: {
-    color: '#e67e22',
+    color: '#ffffff',
     fontSize: '18px',
-    fontWeight: 'bold',
     marginBottom: '15px',
+    fontWeight: 'bold',
   },
   row: {
     display: 'flex',
     alignItems: 'center',
     gap: '15px',
-    marginBottom: '20px',
+    marginBottom: '15px',
   },
   generateButton: {
-    padding: '12px 18px',
-    fontSize: '15px',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    backgroundColor: '#7dd3c0',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-  },
-  roomNumber: {
-    color: '#7dd3c0',
-    fontSize: '20px',
-    fontWeight: 'bold',
-  },
-  inviteSection: {
-    marginTop: '20px',
-  },
-  inviteTitle: {
-    color: '#ffffff',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    marginBottom: '10px',
-  },
-  textarea: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '14px',
-    borderRadius: '8px',
-    border: '2px solid #4a7ba7',
-    backgroundColor: '#1a3a52',
-    color: '#ffffff',
-    boxSizing: 'border-box',
-    marginBottom: '15px',
-    resize: 'vertical',
-  },
-  inviteDetails: {
-    marginBottom: '15px',
-  },
-  detailRow: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '8px',
-  },
-  detailLabel: {
-    color: '#ffffff',
-    fontSize: '14px',
-    fontWeight: 'bold',
-  },
-  detailValue: {
-    color: '#7dd3c0',
-    fontSize: '14px',
-  },
-  copyButton: {
-    padding: '10px 20px',
+    padding: '10px 15px',
     fontSize: '14px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#e67e22',
     border: 'none',
     borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  roomNumber: {
+    color: '#7dd3c0',
+    fontSize: '18px',
+    fontWeight: 'bold',
+  },
+  inviteSection: {
+    backgroundColor: '#1a3a52',
+    padding: '15px',
+    borderRadius: '10px',
+    border: '2px solid #4a7ba7',
+  },
+  inviteTitle: {
+    color: '#ffffff',
+    fontSize: '15px',
+    marginBottom: '10px',
+    fontWeight: 'bold',
+  },
+  textarea: {
+    width: '100%',
+    padding: '10px',
+    fontSize: '14px',
+    borderRadius: '6px',
+    border: '1px solid #4a7ba7',
+    backgroundColor: '#2c4a6d',
+    color: '#ffffff',
+    marginBottom: '10px',
+    boxSizing: 'border-box',
+    resize: 'vertical',
+  },
+  inviteDetails: {
+    backgroundColor: '#2c4a6d',
+    padding: '10px',
+    borderRadius: '6px',
+    marginBottom: '10px',
+  },
+  detailRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '5px',
+    color: '#ffffff',
+    fontSize: '13px',
+  },
+  detailLabel: {
+    fontWeight: 'bold',
+  },
+  detailValue: {
+    color: '#7dd3c0',
+  },
+  copyButton: {
+    width: '100%',
+    padding: '10px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    backgroundColor: '#8b2d8b',
+    border: 'none',
+    borderRadius: '6px',
     cursor: 'pointer',
   },
   presetHeader: {
@@ -361,11 +328,11 @@ const styles = {
     gap: '8px',
   },
   smallButton: {
-    padding: '8px 14px',
-    fontSize: '13px',
+    padding: '6px 12px',
+    fontSize: '12px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#8b2d8b',
+    backgroundColor: '#4a7ba7',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
@@ -375,56 +342,57 @@ const styles = {
     padding: '12px',
     borderRadius: '8px',
     color: '#ffffff',
-    fontSize: '14px',
+    fontSize: '13px',
     marginBottom: '15px',
-    lineHeight: '1.6',
+    border: '2px solid #7dd3c0',
   },
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '10px',
+    marginBottom: '15px',
   },
   presetButton: {
-    padding: '14px',
-    fontSize: '14px',
+    padding: '15px 8px',
+    fontSize: '13px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#4a7ba7',
-    border: 'none',
+    backgroundColor: '#2c4a6d',
+    border: '2px solid #4a7ba7',
     borderRadius: '8px',
     cursor: 'pointer',
   },
   presetSelected: {
-    backgroundColor: '#e67e22',
+    backgroundColor: '#7dd3c0',
+    color: '#1a2332',
+    border: '2px solid #7dd3c0',
   },
   editPanel: {
     backgroundColor: '#1a3a52',
-    padding: '20px',
+    padding: '15px',
     borderRadius: '8px',
-    marginTop: '15px',
+    border: '2px solid #4a7ba7',
   },
   editRow: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '15px',
+    justifyContent: 'space-between',
+    marginBottom: '10px',
     color: '#ffffff',
-    fontSize: '14px',
   },
   editInput: {
     width: '80px',
-    padding: '8px',
+    padding: '6px',
     fontSize: '14px',
-    borderRadius: '6px',
-    border: '2px solid #4a7ba7',
+    borderRadius: '4px',
+    border: '1px solid #4a7ba7',
     backgroundColor: '#2c4a6d',
     color: '#ffffff',
-    textAlign: 'center',
   },
   waitingButton: {
     width: '100%',
     padding: '16px',
-    fontSize: '20px',
+    fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#7dd3c0',

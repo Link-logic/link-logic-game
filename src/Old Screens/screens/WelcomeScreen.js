@@ -18,13 +18,10 @@ function WelcomeScreen({ onNavigate }) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        {/* Logo Section */}
-        <div style={styles.logoBox}>
-          <img 
-            src="/LargeLogo.png" 
-            alt="Link Logic" 
-            style={styles.logo}
-          />
+        {/* Purple Banner */}
+        {/* Large Logo */}
+        <div style={styles.logoContainer}>
+          <img src="/LargeLogo.png" alt="Link Logic" style={styles.largeLogo} />
         </div>
 
         {/* Tagline */}
@@ -47,13 +44,25 @@ function WelcomeScreen({ onNavigate }) {
 
         {/* Buttons */}
         <div style={styles.buttonRow}>
-          <button onClick={handleHost} style={styles.hostButton}>
+          <button 
+            onClick={handleHost} 
+            disabled={roomNumber.trim() !== ''}
+            style={{
+              ...styles.hostButton,
+              ...(roomNumber.trim() !== '' ? styles.disabledButton : {})
+            }}
+          >
             Host
           </button>
-          <button onClick={handlePlay} style={styles.playerButton}>
-            Player
+          <button onClick={handlePlay} style={styles.playButton}>
+            Play
           </button>
         </div>
+
+        {/* Instructions Button */}
+        <button onClick={() => onNavigate('instructions')} style={styles.instructionsButton}>
+          Instructions
+        </button>
       </div>
     </div>
   );
@@ -62,88 +71,112 @@ function WelcomeScreen({ onNavigate }) {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: '#1a2332',
+    background: 'linear-gradient(135deg, #1a2332 0%, #2c3e50 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '20px',
   },
   card: {
-    backgroundColor: '#2c4a6d',
-    borderRadius: '20px',
-    border: '3px solid #4a7ba7',
-    padding: '40px',
-    maxWidth: '420px',
-    width: '100%',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+    background: 'linear-gradient(180deg, #4a7ba7 0%, #2c5a7d 100%)',
+    borderRadius: '25px',
+    padding: '8px',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+    width: '450px',
   },
-  logoBox: {
-    backgroundColor: '#8b2d8b',
-    padding: '20px',
-    borderRadius: '12px',
-    textAlign: 'center',
-    marginBottom: '30px',
+  logoContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '20px',
   },
-  logo: {
-    maxWidth: '220px',
+  largeLogo: {
     width: '100%',
+    maxWidth: '400px',
     height: 'auto',
   },
   tagline: {
     color: '#ffffff',
-    fontSize: '22px',
-    fontWeight: 'bold',
+    fontSize: '24px',
+    fontWeight: '600',
     textAlign: 'center',
-    margin: '0 0 35px 0',
+    marginBottom: '30px',
     lineHeight: '1.4',
+    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
   },
   inputGroup: {
     marginBottom: '25px',
+    padding: '0 20px',
   },
   label: {
-    display: 'block',
     color: '#ffffff',
-    fontSize: '16px',
+    fontSize: '18px',
+    fontWeight: 'bold',
     marginBottom: '10px',
-    fontWeight: '500',
+    display: 'block',
+    textAlign: 'center',
   },
   input: {
     width: '100%',
-    padding: '14px',
-    fontSize: '16px',
-    borderRadius: '8px',
-    border: '2px solid #4a7ba7',
-    backgroundColor: '#1a3a52',
+    padding: '15px',
+    fontSize: '18px',
+    borderRadius: '10px',
+    border: '2px solid #00bcd4',
+    backgroundColor: '#1e3a52',
     color: '#ffffff',
     boxSizing: 'border-box',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   buttonRow: {
     display: 'flex',
     gap: '15px',
+    marginBottom: '20px',
+    padding: '0 20px',
   },
   hostButton: {
     flex: 1,
-    padding: '16px',
-    fontSize: '18px',
+    padding: '18px',
+    fontSize: '24px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#8b2d8b',
+    backgroundColor: '#ff6600',
     border: 'none',
-    borderRadius: '10px',
+    borderRadius: '12px',
     cursor: 'pointer',
-    transition: 'transform 0.2s',
+    boxShadow: '0 4px 15px rgba(255, 102, 0, 0.4)',
+    transition: 'all 0.2s',
   },
-  playerButton: {
+  playButton: {
     flex: 1,
-    padding: '16px',
+    padding: '18px',
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    backgroundColor: '#00ff00',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    boxShadow: '0 4px 15px rgba(0, 255, 0, 0.4)',
+    transition: 'all 0.2s',
+  },
+  instructionsButton: {
+    width: 'calc(100% - 40px)',
+    margin: '0 20px',
+    padding: '15px',
     fontSize: '18px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#4a7ba7',
+    backgroundColor: '#0066ff',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
-    transition: 'transform 0.2s',
+    boxShadow: '0 4px 15px rgba(0, 102, 255, 0.4)',
+  },
+  disabledButton: {
+    backgroundColor: '#555555',
+    cursor: 'not-allowed',
+    opacity: 0.5,
+    boxShadow: 'none',
   },
 };
 

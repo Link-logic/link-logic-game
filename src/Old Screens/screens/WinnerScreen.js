@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ref, onValue, update, remove } from 'firebase/database';
+import { ref, onValue, update } from 'firebase/database';
 import { database } from '../config/firebase';
+import ScreenFrame from '../components/ScreenFrame';
 
 function WinnerScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) {
   const [standings, setStandings] = useState([]);
@@ -13,48 +14,18 @@ function WinnerScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) 
       if (snapshot.exists()) {
         const data = snapshot.val();
         
-        if (data.players && data.rounds) {
-          const playerScores = {};
+        if (data.players) {
+          const playersList = Object.entries(data.players).map(([id, player]) => ({
+            id,
+            playerName: player.playerName,
+            totalPoints: player.points || 0
+          }));
           
-          Object.keys(data.players).forEach(pId => {
-            const player = data.players[pId];
-            playerScores[pId] = {
-              playerName: player.playerName,
-              totalPoints: 0
-            };
-          });
-
-          Object.keys(data.rounds).forEach(roundKey => {
-            const round = data.rounds[roundKey];
-            if (round.submissions) {
-              Object.entries(round.submissions).forEach(([pId, playerData]) => {
-                if (playerScores[pId]) {
-                  let roundPoints = playerData.totalPoints || 0;
-                  
-                  if (round.results) {
-                    Object.entries(round.results).forEach(([resultKey, result]) => {
-                      const [challengedPlayerId] = resultKey.split('-');
-                      if (challengedPlayerId === pId && result === 'rejected') {
-                        const submissionIndex = parseInt(resultKey.split('-')[1]);
-                        const rejectedSubmission = playerData.submissions[submissionIndex];
-                        if (rejectedSubmission) {
-                          roundPoints -= rejectedSubmission.points;
-                        }
-                      }
-                    });
-                  }
-                  
-                  playerScores[pId].totalPoints += roundPoints;
-                }
-              });
-            }
-          });
-
-          const sortedStandings = Object.values(playerScores).sort((a, b) => b.totalPoints - a.totalPoints);
-          setStandings(sortedStandings);
+          const sortedPlayers = playersList.sort((a, b) => b.totalPoints - a.totalPoints);
+          setStandings(sortedPlayers);
           
-          if (sortedStandings.length > 0) {
-            setWinner(sortedStandings[0]);
+          if (sortedPlayers.length > 0) {
+            setWinner(sortedPlayers[0]);
           }
         }
 
@@ -65,55 +36,61 @@ function WinnerScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) 
     });
 
     return () => unsubscribe();
-  }, [roomNumber, playerId, playerName, isHost, onNavigate]);
-
-  const playAgain = async () => {
-    if (!isHost) return;
-
-    const roomRef = ref(database, `rooms/${roomNumber}`);
-    
-    await update(roomRef, {
-      status: 'waiting',
-      currentRound: 0,
-      words: null,
-      bonusIndices: null,
-      rounds: null,
-      chat: null
-    });
-
-    const snapshot = await onValue(ref(database, `rooms/${roomNumber}/players`), (snap) => {
-      if (snap.exists()) {
-        const players = snap.val();
-        Object.keys(players).forEach(async (pId) => {
-          await update(ref(database, `rooms/${roomNumber}/players/${pId}`), {
-            points: 0
-          });
-        });
-      }
-    }, { onlyOnce: true });
-  };
+  }, [roomNumber, onNavigate, playerId, playerName, isHost]);
 
   const newGame = async () => {
     if (!isHost) return;
-
-    const roomRef = ref(database, `rooms/${roomNumber}`);
-    await remove(roomRef);
     
-    onNavigate('hostroom', { playerId, playerName });
+    const roomRef = ref(database, `rooms/${roomNumber}`);
+    await update(roomRef, {
+      status: 'waiting',
+      currentRound: 0,
+      rounds: {},
+      words: null,
+      bonusIndices: null,
+      challenges: null,
+      defenses: null,
+      votes: null
+    });
+  };
+
+  const playAgain = async () => {
+    if (!isHost) return;
+    
+    const roomRef = ref(database, `rooms/${roomNumber}`);
+    
+    const snapshot = await get(roomRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const resetPlayers = {};
+      Object.entries(data.players || {}).forEach(([pId, player]) => {
+        resetPlayers[pId] = {
+          ...player,
+          points: 0
+        };
+      });
+      
+      await update(roomRef, {
+        players: resetPlayers,
+        status: 'waiting',
+        currentRound: 0,
+        rounds: {},
+        words: null,
+        bonusIndices: null,
+        challenges: null,
+        defenses: null,
+        votes: null
+      });
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* Small Logo Banner */}
-        <div style={styles.banner}>
-          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
-        </div>
-
+    <ScreenFrame title="Winner">
+      <div style={styles.content}>
         {/* Winner Section */}
         {winner && (
           <div style={styles.winnerSection}>
-            <img src="/trophy.png" alt="Trophy" style={styles.trophy} />
+            <div style={styles.trophyIcon}>🏆</div>
             <h1 style={styles.winnerTitle}>Winner</h1>
             <div style={styles.winnerName}>{winner.playerName}</div>
             <div style={styles.winnerPoints}>{winner.totalPoints} Points</div>
@@ -153,40 +130,14 @@ function WinnerScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) 
           </div>
         )}
       </div>
-    </div>
+    </ScreenFrame>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#1a2332',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: '#2c4a6d',
-    borderRadius: '20px',
-    border: '3px solid #4a7ba7',
-    padding: '35px',
-    maxWidth: '600px',
+  content: {
     width: '100%',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-  },
-  banner: {
-    backgroundColor: '#8b2d8b',
-    padding: '12px',
-    borderRadius: '10px',
-    marginBottom: '30px',
-    textAlign: 'center',
-  },
-  logo: {
-    maxWidth: '110px',
-    height: 'auto',
+    maxWidth: '600px',
   },
   winnerSection: {
     textAlign: 'center',
@@ -196,23 +147,21 @@ const styles = {
     borderRadius: '15px',
     border: '3px solid #e67e22',
   },
-  trophy: {
-    width: '100px',
-    height: 'auto',
-    marginBottom: '20px',
+  trophyIcon: {
+    fontSize: '80px',
+    marginBottom: '15px',
   },
   winnerTitle: {
     color: '#e67e22',
-    fontSize: '36px',
+    fontSize: '32px',
     fontWeight: 'bold',
-    marginBottom: '15px',
-    margin: '0 0 15px 0',
+    margin: '10px 0',
   },
   winnerName: {
     color: '#7dd3c0',
-    fontSize: '32px',
+    fontSize: '28px',
     fontWeight: 'bold',
-    marginBottom: '10px',
+    margin: '15px 0',
   },
   winnerPoints: {
     color: '#ffffff',
@@ -223,51 +172,51 @@ const styles = {
     marginBottom: '30px',
   },
   standingsTitle: {
-    color: '#e67e22',
-    fontSize: '24px',
+    color: '#ffffff',
+    fontSize: '22px',
     fontWeight: 'bold',
-    marginBottom: '20px',
+    marginBottom: '15px',
     textAlign: 'center',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
     backgroundColor: '#1a3a52',
-    borderRadius: '10px',
+    borderRadius: '8px',
     overflow: 'hidden',
   },
   headerRow: {
-    backgroundColor: '#2c4a6d',
-    borderBottom: '2px solid #4a7ba7',
+    backgroundColor: '#4a7ba7',
   },
   th: {
     color: '#ffffff',
-    padding: '15px',
-    textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
+    padding: '12px',
+    textAlign: 'left',
   },
   thPoints: {
     color: '#ffffff',
-    padding: '15px',
-    textAlign: 'center',
     fontSize: '16px',
     fontWeight: 'bold',
+    padding: '12px',
+    textAlign: 'center',
+    width: '140px',
   },
   row: {
     borderBottom: '1px solid #2c4a6d',
   },
   td: {
     color: '#ffffff',
-    padding: '15px',
-    fontSize: '16px',
+    fontSize: '15px',
+    padding: '12px',
   },
   tdPoints: {
     color: '#7dd3c0',
-    padding: '15px',
-    fontSize: '18px',
-    fontWeight: 'bold',
+    fontSize: '15px',
+    padding: '12px',
     textAlign: 'center',
+    fontWeight: 'bold',
   },
   buttonRow: {
     display: 'flex',
@@ -275,19 +224,19 @@ const styles = {
   },
   newGameButton: {
     flex: 1,
-    padding: '16px',
-    fontSize: '18px',
+    padding: '14px',
+    fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#8b2d8b',
+    backgroundColor: '#e67e22',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
   },
   playAgainButton: {
     flex: 1,
-    padding: '16px',
-    fontSize: '18px',
+    padding: '14px',
+    fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#7dd3c0',

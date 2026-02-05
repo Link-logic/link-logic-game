@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, update } from 'firebase/database';
 import { database } from '../config/firebase';
+import ScreenFrame from '../components/ScreenFrame';
 
 function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) {
   const [challenges, setChallenges] = useState({});
+  const [roundData, setRoundData] = useState({});
   const [defenses, setDefenses] = useState({});
   const [votes, setVotes] = useState({});
   const [currentRound, setCurrentRound] = useState(1);
-  const [totalRounds, setTotalRounds] = useState(5);
-  const [roundData, setRoundData] = useState({});
   const [playerCount, setPlayerCount] = useState(0);
+  const [settings, setSettings] = useState(null);
 
   useEffect(() => {
     const roomRef = ref(database, `rooms/${roomNumber}`);
@@ -21,86 +22,94 @@ function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost 
         if (data.currentRound) {
           setCurrentRound(data.currentRound);
         }
-        
+
+        if (data.challenges) {
+          setChallenges(data.challenges);
+        }
+
         if (data.settings) {
-          setTotalRounds(data.settings.rounds);
+          setSettings(data.settings);
         }
 
         if (data.players) {
           setPlayerCount(Object.keys(data.players).length);
         }
 
-        if (data.rounds && data.rounds[`round${data.currentRound}`]) {
-          const roundInfo = data.rounds[`round${data.currentRound}`];
-          setRoundData(roundInfo.submissions || {});
-          setChallenges(roundInfo.challenges || {});
-          
-          if (roundInfo.defenses) {
-            setDefenses(roundInfo.defenses);
-          }
-          
-          if (roundInfo.votes) {
-            setVotes(roundInfo.votes);
-          }
+        if (data.rounds && data.rounds[data.currentRound]) {
+          const round = data.rounds[data.currentRound];
+          const formattedData = {};
+          Object.entries(round.submissions || {}).forEach(([pId, submissions]) => {
+            formattedData[pId] = {
+              playerName: submissions[0]?.playerName || 'Unknown',
+              submissions: Object.values(submissions).map(sub => ({
+                words: [sub.word1, sub.word2],
+                linkWord: sub.linkWord,
+                points: sub.points || 10
+              }))
+            };
+          });
+          setRoundData(formattedData);
         }
 
-        if (data.status === 'waiting') {
-          onNavigate('waiting', { playerId, playerName, roomNumber, isHost });
-        } else if (data.status === 'finished') {
-          onNavigate('winner', { playerId, playerName, roomNumber, isHost });
+        if (data.defenses) {
+          setDefenses(data.defenses);
+        }
+
+        if (data.votes) {
+          setVotes(data.votes);
+        }
+
+        if (data.status === 'leaderboard' || data.status === 'finished') {
+          onNavigate('leaderboard', { playerId, playerName, roomNumber, isHost });
         }
       }
     });
 
     return () => unsubscribe();
-  }, [roomNumber, playerId, playerName, isHost, onNavigate]);
+  }, [roomNumber, onNavigate, playerId, playerName, isHost]);
 
-  const submitDefense = async (targetPlayerId, submissionIndex, defense) => {
+  const submitDefense = async (challengedPlayerId, submissionIndex, defense) => {
+    const defenseKey = `${challengedPlayerId}-${submissionIndex}`;
     const roomRef = ref(database, `rooms/${roomNumber}`);
     await update(roomRef, {
-      [`rounds/round${currentRound}/defenses/${targetPlayerId}-${submissionIndex}`]: defense
+      [`defenses/${defenseKey}`]: defense
     });
   };
 
-  const submitVote = async (targetPlayerId, submissionIndex, voteValue) => {
+  const submitVote = async (challengedPlayerId, submissionIndex, voteType) => {
+    const voteKey = `${challengedPlayerId}-${submissionIndex}`;
     const roomRef = ref(database, `rooms/${roomNumber}`);
-    const voteKey = `${targetPlayerId}-${submissionIndex}`;
-    
     await update(roomRef, {
-      [`rounds/round${currentRound}/votes/${voteKey}/${playerId}`]: voteValue
+      [`votes/${voteKey}/${playerId}`]: voteType
     });
   };
 
-  const processNextRound = async () => {
+  const finalizeChallenges = async () => {
     if (!isHost) return;
-
-    const roomRef = ref(database, `rooms/${roomNumber}`);
     
     const results = {};
-    Object.keys(challenges).forEach(challengedPlayerId => {
-      challenges[challengedPlayerId].forEach(submissionIndex => {
-        const voteKey = `${challengedPlayerId}-${submissionIndex}`;
+    Object.entries(challenges).forEach(([pId, indices]) => {
+      indices.forEach(index => {
+        const voteKey = `${pId}-${index}`;
         const voteData = votes[voteKey] || {};
+        const accepts = Object.values(voteData).filter(v => v === 'accept').length;
+        const rejects = Object.values(voteData).filter(v => v === 'reject').length;
         
-        const acceptVotes = Object.values(voteData).filter(v => v === 'accept').length;
-        const totalVotes = Object.keys(voteData).length;
-        
-        const isAccepted = playerCount === 2 || (acceptVotes / totalVotes) >= 0.5;
-        
-        results[voteKey] = isAccepted ? 'accepted' : 'rejected';
+        results[voteKey] = accepts > rejects ? 'accepted' : 'rejected';
       });
     });
 
-    if (currentRound < totalRounds) {
+    const roomRef = ref(database, `rooms/${roomNumber}`);
+    
+    if (currentRound < (settings?.rounds || 5)) {
       await update(roomRef, {
-        [`rounds/round${currentRound}/results`]: results,
+        [`rounds/${currentRound}/results`]: results,
         status: 'waiting',
-        words: null,
-        bonusIndices: null
+        currentRound: currentRound + 1
       });
     } else {
       await update(roomRef, {
-        [`rounds/round${currentRound}/results`]: results,
+        [`rounds/${currentRound}/results`]: results,
         status: 'finished'
       });
     }
@@ -109,15 +118,8 @@ function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost 
   const hasChallenges = Object.keys(challenges).length > 0;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* Small Logo Banner */}
-        <div style={styles.banner}>
-          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
-        </div>
-
-        <h2 style={styles.title}>LINK DEFENSE</h2>
-
+    <ScreenFrame title="Link Defense">
+      <div style={styles.content}>
         {!hasChallenges ? (
           <div style={styles.noChallenges}>
             No challenges this round!
@@ -138,42 +140,13 @@ function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost 
                     const voteKey = `${challengedPlayerId}-${submissionIndex}`;
                     const currentVotes = votes[voteKey] || {};
                     
-                    const acceptCount = Object.values(currentVotes).filter(v => v === 'accept').length;
-                    const rejectCount = Object.values(currentVotes).filter(v => v === 'reject').length;
-                    
                     return (
                       <div key={submissionIndex} style={styles.challengeItem}>
                         <table style={styles.table}>
                           <tbody>
                             <tr>
-                              <td style={styles.tdLabel}># Words Selected</td>
+                              <td style={styles.tdLabel}>Words Selected</td>
                               <td style={styles.tdValue}>{submission.words.join(' - ')}</td>
-                              <td style={styles.tdButtons} rowSpan="2">
-                                {challengedPlayerId !== playerId && (
-                                  <div style={styles.voteButtons}>
-                                    <button
-                                      onClick={() => submitVote(challengedPlayerId, submissionIndex, 'accept')}
-                                      style={{
-                                        ...styles.voteButton,
-                                        ...styles.acceptButton,
-                                        ...(currentVotes[playerId] === 'accept' ? styles.voteActive : {})
-                                      }}
-                                    >
-                                      Accept
-                                    </button>
-                                    <button
-                                      onClick={() => submitVote(challengedPlayerId, submissionIndex, 'reject')}
-                                      style={{
-                                        ...styles.voteButton,
-                                        ...styles.rejectButton,
-                                        ...(currentVotes[playerId] === 'reject' ? styles.voteActive : {})
-                                      }}
-                                    >
-                                      Reject
-                                    </button>
-                                  </div>
-                                )}
-                              </td>
                             </tr>
                             <tr>
                               <td style={styles.tdLabel}>Link Word</td>
@@ -194,18 +167,31 @@ function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost 
                             />
                           </div>
                         )}
-                        
-                        <div style={styles.resultRow}>
-                          {playerCount === 2 ? (
-                            <span style={styles.accepted}>✓ Accept</span>
-                          ) : (
-                            acceptCount + rejectCount > 0 && (
-                              <span style={(acceptCount / (acceptCount + rejectCount)) >= 0.5 ? styles.accepted : styles.rejected}>
-                                {(acceptCount / (acceptCount + rejectCount)) >= 0.5 ? '✓ Accept' : '✗ Reject'}
-                              </span>
-                            )
-                          )}
-                        </div>
+
+                        {challengedPlayerId !== playerId && (
+                          <div style={styles.voteButtons}>
+                            <button
+                              onClick={() => submitVote(challengedPlayerId, submissionIndex, 'accept')}
+                              style={{
+                                ...styles.voteButton,
+                                ...styles.acceptButton,
+                                ...(currentVotes[playerId] === 'accept' ? styles.voteActive : {})
+                              }}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => submitVote(challengedPlayerId, submissionIndex, 'reject')}
+                              style={{
+                                ...styles.voteButton,
+                                ...styles.rejectButton,
+                                ...(currentVotes[playerId] === 'reject' ? styles.voteActive : {})
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -215,167 +201,112 @@ function ChallengeScreen({ onNavigate, playerId, playerName, roomNumber, isHost 
           </div>
         )}
 
-        {/* Host Control */}
         {isHost && (
-          <button onClick={processNextRound} style={styles.nextButton}>
-            {currentRound < totalRounds ? 'Next Round' : 'Game Over'}
+          <button onClick={finalizeChallenges} style={styles.finalizeButton}>
+            {currentRound < (settings?.rounds || 5) ? 'Next Round' : 'Show Winner'}
           </button>
         )}
       </div>
-    </div>
+    </ScreenFrame>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#1a2332',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: '#2c4a6d',
-    borderRadius: '20px',
-    border: '3px solid #4a7ba7',
-    padding: '35px',
-    maxWidth: '850px',
+  content: {
     width: '100%',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-  },
-  banner: {
-    backgroundColor: '#8b2d8b',
-    padding: '12px',
-    borderRadius: '10px',
-    marginBottom: '25px',
-    textAlign: 'center',
-  },
-  logo: {
-    maxWidth: '110px',
-    height: 'auto',
-  },
-  title: {
-    color: '#e67e22',
-    fontSize: '28px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: '30px',
+    maxWidth: '850px',
   },
   noChallenges: {
-    color: '#ffffff',
+    color: '#7dd3c0',
     fontSize: '20px',
     textAlign: 'center',
     padding: '40px',
-    backgroundColor: '#1a3a52',
-    borderRadius: '10px',
-    marginBottom: '30px',
   },
   challengeSection: {
-    marginBottom: '30px',
+    marginBottom: '25px',
   },
   playerSection: {
-    backgroundColor: '#1a3a52',
-    padding: '20px',
-    borderRadius: '10px',
-    marginBottom: '20px',
+    marginBottom: '30px',
   },
   playerName: {
-    color: '#e67e22',
+    color: '#7dd3c0',
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '15px',
+    marginBottom: '12px',
   },
   challengeItem: {
-    backgroundColor: '#2c4a6d',
+    backgroundColor: '#1a3a52',
     padding: '15px',
     borderRadius: '8px',
     marginBottom: '15px',
   },
   table: {
     width: '100%',
-    borderCollapse: 'collapse',
+    marginBottom: '10px',
   },
   tdLabel: {
-    color: '#ffffff',
+    color: '#e67e22',
     fontSize: '14px',
     fontWeight: 'bold',
     padding: '8px',
-    width: '30%',
+    width: '140px',
   },
   tdValue: {
     color: '#ffffff',
     fontSize: '14px',
     padding: '8px',
   },
-  tdButtons: {
-    padding: '8px',
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    width: '25%',
+  defenseSection: {
+    marginTop: '10px',
+  },
+  defenseLabel: {
+    color: '#ffffff',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    display: 'block',
+    marginBottom: '8px',
+  },
+  textarea: {
+    width: '100%',
+    padding: '10px',
+    fontSize: '14px',
+    borderRadius: '6px',
+    border: '2px solid #4a7ba7',
+    backgroundColor: '#2c4a6d',
+    color: '#ffffff',
+    resize: 'vertical',
+    boxSizing: 'border-box',
   },
   voteButtons: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+    gap: '10px',
+    marginTop: '10px',
   },
   voteButton: {
+    flex: 1,
     padding: '10px',
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#ffffff',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
   },
   acceptButton: {
     backgroundColor: '#7dd3c0',
+    color: '#1a2332',
   },
   rejectButton: {
     backgroundColor: '#ff6b6b',
+    color: '#ffffff',
   },
   voteActive: {
-    boxShadow: '0 0 15px rgba(255, 255, 255, 0.6)',
+    transform: 'scale(0.95)',
+    opacity: 0.8,
   },
-  defenseSection: {
-    marginTop: '15px',
-  },
-  defenseLabel: {
-    display: 'block',
-    color: '#ffffff',
-    fontSize: '14px',
-    marginBottom: '8px',
-    fontWeight: 'bold',
-  },
-  textarea: {
+  finalizeButton: {
     width: '100%',
-    padding: '12px',
-    fontSize: '14px',
-    borderRadius: '8px',
-    border: '2px solid #4a7ba7',
-    backgroundColor: '#1a3a52',
-    color: '#ffffff',
-    boxSizing: 'border-box',
-    resize: 'vertical',
-  },
-  resultRow: {
-    marginTop: '15px',
-    textAlign: 'center',
+    padding: '16px',
     fontSize: '18px',
-    fontWeight: 'bold',
-  },
-  accepted: {
-    color: '#7dd3c0',
-  },
-  rejected: {
-    color: '#ff6b6b',
-  },
-  nextButton: {
-    width: '100%',
-    padding: '18px',
-    fontSize: '20px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#7dd3c0',

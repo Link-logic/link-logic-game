@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, set, update } from 'firebase/database';
 import { database } from '../config/firebase';
+import ScreenFrame from '../components/ScreenFrame';
 
 function WaitingRoomScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) {
   const [players, setPlayers] = useState([]);
@@ -87,20 +88,12 @@ function WaitingRoomScreen({ onNavigate, playerId, playerName, roomNumber, isHos
   };
 
   const changeHost = () => {
-    // Simplified for now
     alert('Select new host from player list');
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* Small Logo Banner */}
-        <div style={styles.banner}>
-          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
-        </div>
-
-        <h2 style={styles.title}>Waiting Room</h2>
-
+    <ScreenFrame title="Waiting Room">
+      <div style={styles.content}>
         {/* Room Number */}
         <div style={styles.roomInfo}>
           Room #: <span style={styles.roomNumber}>{roomNumber}</span>
@@ -183,64 +176,30 @@ function WaitingRoomScreen({ onNavigate, playerId, playerName, roomNumber, isHos
           </div>
         )}
       </div>
-    </div>
+    </ScreenFrame>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#1a2332',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: '#2c4a6d',
-    borderRadius: '20px',
-    border: '3px solid #4a7ba7',
-    padding: '35px',
-    maxWidth: '650px',
+  content: {
     width: '100%',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-  },
-  banner: {
-    backgroundColor: '#8b2d8b',
-    padding: '12px',
-    borderRadius: '10px',
-    marginBottom: '25px',
-    textAlign: 'center',
-  },
-  logo: {
-    maxWidth: '110px',
-    height: 'auto',
-  },
-  title: {
-    color: '#ffffff',
-    fontSize: '32px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: '0 0 20px 0',
+    maxWidth: '520px',
   },
   roomInfo: {
     color: '#ffffff',
     fontSize: '18px',
     textAlign: 'center',
-    marginBottom: '30px',
+    marginBottom: '25px',
+    fontWeight: 'bold',
   },
   roomNumber: {
     color: '#7dd3c0',
-    fontWeight: 'bold',
-    fontSize: '20px',
   },
   section: {
     marginBottom: '25px',
   },
   sectionTitle: {
-    color: '#e67e22',
+    color: '#ffffff',
     fontSize: '18px',
     fontWeight: 'bold',
     marginBottom: '12px',
@@ -248,16 +207,16 @@ const styles = {
   playersGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '10px',
+    gap: '12px',
   },
   hostBox: {
-    backgroundColor: '#8b2d8b',
+    backgroundColor: '#7dd3c0',
     padding: '12px',
     borderRadius: '8px',
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: '#1a2332',
     textAlign: 'center',
     fontSize: '14px',
+    fontWeight: 'bold',
   },
   playerBox: {
     backgroundColor: '#4a7ba7',
@@ -311,26 +270,22 @@ const styles = {
     fontSize: '18px',
     fontWeight: 'bold',
     textAlign: 'center',
-    minWidth: '80px',
-  },
-  lightOff: {
-    backgroundColor: '#1a3a52',
-    color: '#6b8caf',
   },
   redLight: {
     backgroundColor: '#ff4444',
     color: '#ffffff',
-    boxShadow: '0 0 20px rgba(255, 68, 68, 0.8)',
   },
   yellowLight: {
-    backgroundColor: '#ffaa00',
-    color: '#ffffff',
-    boxShadow: '0 0 20px rgba(255, 170, 0, 0.8)',
+    backgroundColor: '#ffcc00',
+    color: '#1a2332',
   },
   greenLight: {
-    backgroundColor: '#7dd3c0',
-    color: '#ffffff',
-    boxShadow: '0 0 20px rgba(125, 211, 192, 0.8)',
+    backgroundColor: '#44ff44',
+    color: '#1a2332',
+  },
+  lightOff: {
+    backgroundColor: '#1a3a52',
+    color: '#6b8caf',
   },
   buttonRow: {
     display: 'flex',
@@ -338,7 +293,7 @@ const styles = {
   },
   newHostButton: {
     flex: 1,
-    padding: '16px',
+    padding: '14px',
     fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
@@ -348,9 +303,9 @@ const styles = {
     cursor: 'pointer',
   },
   tapToPlayButton: {
-    flex: 2,
-    padding: '16px',
-    fontSize: '20px',
+    flex: 1,
+    padding: '14px',
+    fontSize: '16px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#7dd3c0',
