@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { ref, set, get } from 'firebase/database';
+import { ref, set, get, update } from 'firebase/database';
 import { database } from '../config/firebase';
 import { presets } from '../data/presets';
-import ScreenFrame from '../components/ScreenFrame';
 
 function HostRoomScreen({ onNavigate, playerId, playerName }) {
   const [roomNumber, setRoomNumber] = useState('');
@@ -15,6 +14,7 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
     bonusWords: 3
   });
   const [invitationMessage, setInvitationMessage] = useState('');
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   const generateRoomNumber = () => {
     const newRoomNumber = Math.floor(100000 + Math.random() * 900000).toString();
@@ -37,6 +37,7 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
       bonusWords: preset.bonusWords
     });
     setEditMode(false);
+    setSettingsSaved(false);
   };
 
   const handleSave = async () => {
@@ -46,23 +47,36 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
     }
     
     const roomRef = ref(database, `rooms/${roomNumber}`);
-    await set(roomRef, {
-      hostId: playerId,
-      hostName: playerName,
-      status: 'waiting',
-      settings: presetSettings,
-      players: {
-        [playerId]: {
-          playerName,
-          points: 0,
-          isHost: true
-        }
-      },
-      currentRound: 0,
-      createdAt: new Date().toISOString()
-    });
+    
+    // Check if room exists
+    const snapshot = await get(roomRef);
+    
+    if (snapshot.exists()) {
+      // Update existing room settings
+      await update(roomRef, {
+        settings: presetSettings
+      });
+    } else {
+      // Create new room with settings
+      await set(roomRef, {
+        hostId: playerId,
+        hostName: playerName,
+        status: 'waiting',
+        settings: presetSettings,
+        players: {
+          [playerId]: {
+            playerName,
+            points: 0,
+            isHost: true
+          }
+        },
+        currentRound: 0,
+        createdAt: new Date().toISOString()
+      });
+    }
     
     setEditMode(false);
+    setSettingsSaved(true);
     alert('Settings saved!');
   };
 
@@ -77,6 +91,7 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
       });
     }
     setEditMode(false);
+    setSettingsSaved(false);
   };
 
   const copyInvitation = () => {
@@ -90,19 +105,46 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
       return;
     }
 
+    // Save settings before going to waiting room
     const roomRef = ref(database, `rooms/${roomNumber}`);
     const snapshot = await get(roomRef);
     
     if (!snapshot.exists()) {
-      await handleSave();
+      await set(roomRef, {
+        hostId: playerId,
+        hostName: playerName,
+        status: 'waiting',
+        settings: presetSettings,
+        players: {
+          [playerId]: {
+            playerName,
+            points: 0,
+            isHost: true
+          }
+        },
+        currentRound: 0,
+        createdAt: new Date().toISOString()
+      });
+    } else if (!settingsSaved) {
+      // Update settings if they were changed but not saved
+      await update(roomRef, {
+        settings: presetSettings
+      });
     }
 
     onNavigate('waiting', { playerId, playerName, roomNumber, isHost: true });
   };
 
   return (
-    <ScreenFrame title="Host Room">
-      <div style={styles.content}>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        {/* Small Logo Banner */}
+        <div style={styles.banner}>
+          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
+        </div>
+
+        <h2 style={styles.title}>Host</h2>
+
         {/* Game Setup Section */}
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Game Setup:</h3>
@@ -144,9 +186,11 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
         {/* Preset Selection */}
         <div style={styles.section}>
           <div style={styles.presetHeader}>
-            <h3 style={styles.sectionTitle}>Select Difficulty Level</h3>
+            <h3 style={styles.sectionTitle}>Select Preset Level</h3>
             <div style={styles.controlButtons}>
-              <button onClick={() => setEditMode(!editMode)} style={styles.smallButton}>Edit</button>
+              <button onClick={() => setEditMode(!editMode)} style={styles.smallButton}>
+                {editMode ? 'Cancel' : 'Edit'}
+              </button>
               <button onClick={handleSave} style={styles.smallButton}>Save</button>
               <button onClick={handleReset} style={styles.smallButton}>Reset</button>
             </div>
@@ -154,9 +198,10 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
 
           {selectedPreset && (
             <div style={styles.presetInfo}>
-              Level {selectedPreset} - Preset Settings:<br />
+              <strong>Level {selectedPreset}</strong><br />
               Words: {presetSettings.words} | Timer: {presetSettings.timer}s<br />
               Rounds: {presetSettings.rounds} | Bonus Words: {presetSettings.bonusWords}
+              {settingsSaved && <div style={styles.savedIndicator}>✓ Saved</div>}
             </div>
           )}
 
@@ -171,7 +216,7 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
                   ...(selectedPreset === level ? styles.presetSelected : {})
                 }}
               >
-                Preset {level}
+                Level {level}
               </button>
             ))}
           </div>
@@ -184,16 +229,22 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
                 <input
                   type="number"
                   value={presetSettings.words}
-                  onChange={(e) => setPresetSettings({...presetSettings, words: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    setPresetSettings({...presetSettings, words: parseInt(e.target.value) || 0});
+                    setSettingsSaved(false);
+                  }}
                   style={styles.editInput}
                 />
               </div>
               <div style={styles.editRow}>
-                <label>Timer:</label>
+                <label>Timer (seconds):</label>
                 <input
                   type="number"
                   value={presetSettings.timer}
-                  onChange={(e) => setPresetSettings({...presetSettings, timer: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    setPresetSettings({...presetSettings, timer: parseInt(e.target.value) || 0});
+                    setSettingsSaved(false);
+                  }}
                   style={styles.editInput}
                 />
               </div>
@@ -202,7 +253,10 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
                 <input
                   type="number"
                   value={presetSettings.rounds}
-                  onChange={(e) => setPresetSettings({...presetSettings, rounds: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    setPresetSettings({...presetSettings, rounds: parseInt(e.target.value) || 0});
+                    setSettingsSaved(false);
+                  }}
                   style={styles.editInput}
                 />
               </div>
@@ -211,7 +265,10 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
                 <input
                   type="number"
                   value={presetSettings.bonusWords}
-                  onChange={(e) => setPresetSettings({...presetSettings, bonusWords: parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    setPresetSettings({...presetSettings, bonusWords: parseInt(e.target.value) || 0});
+                    setSettingsSaved(false);
+                  }}
                   style={styles.editInput}
                 />
               </div>
@@ -224,32 +281,118 @@ function HostRoomScreen({ onNavigate, playerId, playerName }) {
           Waiting Room
         </button>
       </div>
-    </ScreenFrame>
+    </div>
   );
 }
 
 const styles = {
-  content: {
+  container: {
+    minHeight: '100vh',
+    background: '#1a2332',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  card: {
+    backgroundColor: '#2c4a6d',
+    borderRadius: '20px',
+    border: '3px solid #4a7ba7',
+    padding: '35px',
+    maxWidth: '650px',
     width: '100%',
-    maxWidth: '480px',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+  },
+  banner: {
+    backgroundColor: '#8b2d8b',
+    padding: '12px',
+    borderRadius: '10px',
+    marginBottom: '25px',
+    textAlign: 'center',
+  },
+  logo: {
+    maxWidth: '110px',
+    height: 'auto',
+  },
+  title: {
+    color: '#ffffff',
+    fontSize: '32px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: '0 0 30px 0',
   },
   section: {
-    marginBottom: '25px',
+    marginBottom: '30px',
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#e67e22',
     fontSize: '18px',
-    marginBottom: '15px',
     fontWeight: 'bold',
+    marginBottom: '15px',
   },
   row: {
     display: 'flex',
     alignItems: 'center',
     gap: '15px',
-    marginBottom: '15px',
+    marginBottom: '20px',
   },
   generateButton: {
-    padding: '10px 15px',
+    padding: '12px 18px',
+    fontSize: '15px',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    backgroundColor: '#7dd3c0',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  roomNumber: {
+    color: '#7dd3c0',
+    fontSize: '20px',
+    fontWeight: 'bold',
+  },
+  inviteSection: {
+    marginTop: '20px',
+  },
+  inviteTitle: {
+    color: '#ffffff',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    marginBottom: '10px',
+  },
+  textarea: {
+    width: '100%',
+    padding: '12px',
+    fontSize: '14px',
+    borderRadius: '8px',
+    border: '2px solid #4a7ba7',
+    backgroundColor: '#1a3a52',
+    color: '#ffffff',
+    boxSizing: 'border-box',
+    marginBottom: '15px',
+    resize: 'vertical',
+  },
+  inviteDetails: {
+    marginBottom: '15px',
+  },
+  detailRow: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '8px',
+  },
+  detailLabel: {
+    color: '#ffffff',
+    fontSize: '14px',
+    fontWeight: 'bold',
+  },
+  detailValue: {
+    color: '#7dd3c0',
+    fontSize: '14px',
+  },
+  copyButton: {
+    padding: '10px 20px',
     fontSize: '14px',
     fontWeight: 'bold',
     color: '#ffffff',
@@ -258,81 +401,24 @@ const styles = {
     borderRadius: '8px',
     cursor: 'pointer',
   },
-  roomNumber: {
-    color: '#7dd3c0',
-    fontSize: '18px',
-    fontWeight: 'bold',
-  },
-  inviteSection: {
-    backgroundColor: '#1a3a52',
-    padding: '15px',
-    borderRadius: '10px',
-    border: '2px solid #4a7ba7',
-  },
-  inviteTitle: {
-    color: '#ffffff',
-    fontSize: '15px',
-    marginBottom: '10px',
-    fontWeight: 'bold',
-  },
-  textarea: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '14px',
-    borderRadius: '6px',
-    border: '1px solid #4a7ba7',
-    backgroundColor: '#2c4a6d',
-    color: '#ffffff',
-    marginBottom: '10px',
-    boxSizing: 'border-box',
-    resize: 'vertical',
-  },
-  inviteDetails: {
-    backgroundColor: '#2c4a6d',
-    padding: '10px',
-    borderRadius: '6px',
-    marginBottom: '10px',
-  },
-  detailRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '5px',
-    color: '#ffffff',
-    fontSize: '13px',
-  },
-  detailLabel: {
-    fontWeight: 'bold',
-  },
-  detailValue: {
-    color: '#7dd3c0',
-  },
-  copyButton: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#ffffff',
-    backgroundColor: '#8b2d8b',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-  },
   presetHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '15px',
+    flexWrap: 'wrap',
+    gap: '10px',
   },
   controlButtons: {
     display: 'flex',
     gap: '8px',
   },
   smallButton: {
-    padding: '6px 12px',
-    fontSize: '12px',
+    padding: '8px 14px',
+    fontSize: '13px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#4a7ba7',
+    backgroundColor: '#8b2d8b',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
@@ -342,9 +428,15 @@ const styles = {
     padding: '12px',
     borderRadius: '8px',
     color: '#ffffff',
-    fontSize: '13px',
+    fontSize: '14px',
     marginBottom: '15px',
-    border: '2px solid #7dd3c0',
+    lineHeight: '1.6',
+    position: 'relative',
+  },
+  savedIndicator: {
+    color: '#7dd3c0',
+    fontWeight: 'bold',
+    marginTop: '5px',
   },
   presetGrid: {
     display: 'grid',
@@ -353,46 +445,46 @@ const styles = {
     marginBottom: '15px',
   },
   presetButton: {
-    padding: '15px 8px',
-    fontSize: '13px',
+    padding: '14px',
+    fontSize: '14px',
     fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#2c4a6d',
-    border: '2px solid #4a7ba7',
+    backgroundColor: '#4a7ba7',
+    border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
   },
   presetSelected: {
-    backgroundColor: '#7dd3c0',
-    color: '#1a2332',
-    border: '2px solid #7dd3c0',
+    backgroundColor: '#e67e22',
   },
   editPanel: {
     backgroundColor: '#1a3a52',
-    padding: '15px',
+    padding: '20px',
     borderRadius: '8px',
-    border: '2px solid #4a7ba7',
+    marginTop: '15px',
   },
   editRow: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: '10px',
+    alignItems: 'center',
+    marginBottom: '15px',
     color: '#ffffff',
+    fontSize: '14px',
   },
   editInput: {
     width: '80px',
-    padding: '6px',
+    padding: '8px',
     fontSize: '14px',
-    borderRadius: '4px',
-    border: '1px solid #4a7ba7',
+    borderRadius: '6px',
+    border: '2px solid #4a7ba7',
     backgroundColor: '#2c4a6d',
     color: '#ffffff',
+    textAlign: 'center',
   },
   waitingButton: {
     width: '100%',
     padding: '16px',
-    fontSize: '16px',
+    fontSize: '20px',
     fontWeight: 'bold',
     color: '#ffffff',
     backgroundColor: '#7dd3c0',

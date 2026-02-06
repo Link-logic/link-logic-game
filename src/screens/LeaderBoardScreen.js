@@ -187,22 +187,22 @@ function LeaderBoardScreen({ onNavigate, playerId, playerName, roomNumber, isHos
     if (nextRound === 2) return { 
       description: 'Link the words in the corners of the word grid.', 
       label: 'Corner',
-      tiers: [[2, 10], [3, 20], [4, 30]] 
+      tiers: [[2, 30], [3, 50], [4, 100]] 
     };
     if (nextRound === 3) return { 
       description: 'Link words that are touching each other.', 
       label: 'Touching',
-      tiers: [[2, 10], [3, 20], [4, 30]] 
+      tiers: [[2, 30], [3, 50], [4, 100]] 
     };
     if (nextRound === 4) return { 
       description: 'Link words on the outer edge of the grid.', 
       label: 'Edge',
-      tiers: [[2, 10], [3, 20], [4, 30]] 
+      tiers: [[2, 30], [3, 50], [4, 100]] 
     };
     if (nextRound === 5) return { 
       description: 'Link words in the same row or column.', 
       label: 'Line',
-      tiers: [[2, 10], [3, 20], [4, 30]] 
+      tiers: [[2, 30], [3, 50], [4, 100]] 
     };
     return null;
   };
@@ -218,7 +218,7 @@ function LeaderBoardScreen({ onNavigate, playerId, playerName, roomNumber, isHos
           {/* Purple Banner */}
           <div style={styles.banner}>
             <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
-            <div style={styles.bannerTitle}>Leader Board</div>
+            <div style={styles.bannerText}>Link Logic</div>
           </div>
 
           <h2 style={styles.title}>Leader Board</h2>
@@ -302,7 +302,7 @@ const styles = {
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
     position: 'relative',
   },
-    banner: {
+  banner: {
     backgroundColor: '#8b2d8b',
     padding: '15px',
     borderRadius: '12px',
@@ -311,18 +311,12 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: '15px',
-    position: 'relative',
   },
   logo: {
     width: '60px',
     height: '60px',
-    backgroundColor: '#ffffff',
-    padding: '2px',
-    borderRadius: '8px',
-    position: 'absolute',
-    left: '15px',
   },
-  bannerTitle: {
+  bannerText: {
     color: '#ffffff',
     fontSize: '36px',
     fontWeight: 'bold',

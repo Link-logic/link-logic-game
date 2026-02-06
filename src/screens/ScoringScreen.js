@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ref, onValue, update } from 'firebase/database';
 import { database } from '../config/firebase';
-import ScreenFrame from '../components/ScreenFrame';
 
 function ScoringScreen({ onNavigate, playerId, playerName, roomNumber, isHost }) {
   const [roundData, setRoundData] = useState({});
   const [challenges, setChallenges] = useState({});
+  const [playerReady, setPlayerReady] = useState({});
   const [currentRound, setCurrentRound] = useState(1);
+  const advanceTriggered = useRef(false);
+
+  const advanceToChallenge = useCallback(async () => {
+    const roomRef = ref(database, `rooms/${roomNumber}`);
+    console.log('Advancing to challenge screen...');
+    await update(roomRef, {
+      status: 'challenge'
+    });
+  }, [roomNumber]);
 
   useEffect(() => {
     const roomRef = ref(database, `rooms/${roomNumber}`);
@@ -19,203 +28,276 @@ function ScoringScreen({ onNavigate, playerId, playerName, roomNumber, isHost })
           setCurrentRound(data.currentRound);
         }
 
-        if (data.rounds && data.rounds[data.currentRound]) {
-          const round = data.rounds[data.currentRound];
+        if (data.rounds && data.rounds[`round${data.currentRound}`]) {
+          const roundInfo = data.rounds[`round${data.currentRound}`];
+          setRoundData(roundInfo.submissions || {});
+          setChallenges(roundInfo.challenges || {});
+          setPlayerReady(roundInfo.playersReady || {});
           
-          const formattedData = {};
-          Object.entries(round.submissions || {}).forEach(([pId, submissions]) => {
-            formattedData[pId] = {
-              playerName: submissions[0]?.playerName || 'Unknown',
-              submissions: Object.values(submissions).map(sub => ({
-                words: [sub.word1, sub.word2],
-                linkWord: sub.linkWord,
-                points: sub.points || 10
-              }))
-            };
-          });
-          
-          setRoundData(formattedData);
+          // AUTO-ADVANCE: If all players ready and I'm host, advance (only once)
+          if (isHost && roundInfo.submissions && !advanceTriggered.current) {
+            const allPlayerIds = Object.keys(roundInfo.submissions);
+            const readyData = roundInfo.playersReady || {};
+            const allReady = allPlayerIds.every(id => readyData[id] === true);
+            
+            if (allReady && allPlayerIds.length > 0) {
+              console.log('All players ready on scoring! Advancing to challenge...');
+              advanceTriggered.current = true;
+              advanceToChallenge();
+            }
+          }
         }
 
         if (data.status === 'challenge') {
+          advanceTriggered.current = false; // Reset for next screen
           onNavigate('challenge', { playerId, playerName, roomNumber, isHost });
         }
       }
     });
 
     return () => unsubscribe();
-  }, [roomNumber, onNavigate, playerId, playerName, isHost]);
+  }, [roomNumber, playerId, playerName, isHost, onNavigate, currentRound, advanceToChallenge]);
 
-  const toggleChallenge = (targetPlayerId, submissionIndex) => {
-    if (targetPlayerId === playerId) return;
+  const toggleChallenge = async (targetPlayerId, submissionIndex) => {
+    const roomRef = ref(database, `rooms/${roomNumber}`);
+    const challengePath = `rounds/round${currentRound}/challenges/${targetPlayerId}`;
     
-    const key = `${targetPlayerId}-${submissionIndex}`;
-    setChallenges(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    const currentChallenges = challenges[targetPlayerId] || [];
+    let newChallenges;
+    
+    if (currentChallenges.includes(submissionIndex)) {
+      newChallenges = currentChallenges.filter(i => i !== submissionIndex);
+    } else {
+      newChallenges = [...currentChallenges, submissionIndex];
+    }
+    
+    if (newChallenges.length === 0) {
+      await update(roomRef, {
+        [challengePath]: null
+      });
+    } else {
+      await update(roomRef, {
+        [challengePath]: newChallenges
+      });
+    }
   };
 
-  const goToChallengeScreen = async () => {
+  const markReady = async () => {
     const roomRef = ref(database, `rooms/${roomNumber}`);
+    console.log('Marking player ready on scoring:', playerId);
     await update(roomRef, {
-      status: 'challenge',
-      challenges: challenges
+      [`rounds/round${currentRound}/playersReady/${playerId}`]: true
     });
+    // The onValue listener above will detect when all players are ready
   };
 
   return (
-    <ScreenFrame title={`Round ${currentRound} Complete`}>
-      <div style={styles.content}>
-        {/* Scoring Section */}
-        <div style={styles.scoringSection}>
-          {Object.entries(roundData).map(([pId, playerData]) => (
-            <div key={pId} style={styles.playerSection}>
-              <h3 style={styles.playerName}>{playerData.playerName}</h3>
-              
-              <table style={styles.table}>
-                <thead>
-                  <tr style={styles.headerRow}>
-                    <th style={styles.thNum}>#</th>
-                    <th style={styles.th}>Words</th>
-                    <th style={styles.th}>Link</th>
-                    <th style={styles.thPts}>Pts</th>
-                    <th style={styles.thChallenge}>Challenge</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {playerData.submissions && playerData.submissions.map((submission, index) => (
-                    <tr key={index} style={styles.row}>
-                      <td style={styles.td}>{index + 1}.</td>
-                      <td style={styles.td}>{submission.words.join(' - ')}</td>
-                      <td style={styles.td}>{submission.linkWord}</td>
-                      <td style={styles.td}>{submission.points}pt</td>
-                      <td style={styles.tdChallenge}>
-                        <button
-                          onClick={() => toggleChallenge(pId, index)}
-                          style={{
-                            ...styles.challengeButton,
-                            ...(challenges[`${pId}-${index}`] ? styles.challengeActive : {})
-                          }}
-                          disabled={pId === playerId}
-                        >
-                          ?
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
+    <div style={styles.outerContainer}>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          {/* Purple Banner */}
+          <div style={styles.banner}>
+            <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
+            <div style={styles.bannerText}>Link Logic</div>
+          </div>
 
-        {/* Host Control */}
-        {isHost && (
-          <button onClick={goToChallengeScreen} style={styles.challengeScreenButton}>
-            Challenge Screen
+          <h2 style={styles.title}>Scoring - Round {currentRound}</h2>
+
+          <div style={styles.scoringSection}>
+            {Object.entries(roundData).map(([pId, playerData]) => (
+              <div key={pId} style={styles.playerSection}>
+                <h3 style={styles.playerName}>{playerData.playerName}</h3>
+                
+                {playerData.submissions && playerData.submissions.map((submission, index) => {
+                  const isChallenged = challenges[pId] && challenges[pId].includes(index);
+                  
+                  return (
+                    <div key={index} style={styles.submissionRow}>
+                      <div style={styles.wordsColumn}>
+                        <strong>Words:</strong> {submission.words.join(' - ')}
+                      </div>
+                      <div style={styles.linkColumn}>
+                        <strong>Link:</strong> {submission.linkWord}
+                      </div>
+                      <div style={styles.pointsColumn}>
+                        <strong>Pts:</strong> {submission.points}
+                      </div>
+                      <div style={styles.challengeColumn}>
+                        {pId !== playerId && (
+                          <button
+                            onClick={() => toggleChallenge(pId, index)}
+                            style={{
+                              ...styles.challengeButton,
+                              ...(isChallenged ? styles.challengedButton : {})
+                            }}
+                          >
+                            ?
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                <div style={styles.totalRow}>
+                  Total Points: {playerData.totalPoints || 0}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button 
+            onClick={markReady} 
+            disabled={playerReady[playerId]}
+            style={{
+              ...styles.challengeBottomButton,
+              ...(playerReady[playerId] ? styles.disabledButton : {})
+            }}
+          >
+            {playerReady[playerId] ? 'Waiting for others...' : 'Challenge'}
           </button>
-        )}
+        </div>
       </div>
-    </ScreenFrame>
+    </div>
   );
 }
 
 const styles = {
-  content: {
+  outerContainer: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #1a2332 0%, #2c3e50 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  container: {
+    background: 'linear-gradient(180deg, #4a7ba7 0%, #2c5a7d 100%)',
+    borderRadius: '25px',
+    padding: '8px',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+  },
+  card: {
+    backgroundColor: '#1e3a52',
+    borderRadius: '20px',
+    padding: '30px',
+    maxWidth: '900px',
     width: '100%',
-    maxWidth: '850px',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    border: '3px solid #00bcd4',
+  },
+  banner: {
+    backgroundColor: '#8b2d8b',
+    padding: '15px',
+    borderRadius: '12px',
+    marginBottom: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '15px',
+  },
+  logo: {
+    width: '60px',
+    height: '60px',
+  },
+  bannerText: {
+    color: '#ffffff',
+    fontSize: '36px',
+    fontWeight: 'bold',
+    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+  },
+  title: {
+    color: '#ffffff',
+    fontSize: '28px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '25px',
+    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
   },
   scoringSection: {
     marginBottom: '25px',
   },
   playerSection: {
-    marginBottom: '30px',
+    backgroundColor: '#0a1929',
+    padding: '20px',
+    borderRadius: '12px',
+    marginBottom: '20px',
+    border: '2px solid #2c4a6d',
   },
   playerName: {
-    color: '#7dd3c0',
-    fontSize: '20px',
+    color: '#00bcd4',
+    fontSize: '22px',
     fontWeight: 'bold',
-    marginBottom: '12px',
+    marginBottom: '15px',
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    backgroundColor: '#1a3a52',
+  submissionRow: {
+    backgroundColor: '#1e3a52',
+    padding: '15px',
     borderRadius: '8px',
-    overflow: 'hidden',
+    marginBottom: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px',
+    border: '1px solid #2c4a6d',
   },
-  headerRow: {
-    backgroundColor: '#4a7ba7',
-  },
-  th: {
+  wordsColumn: {
+    flex: 2,
     color: '#ffffff',
     fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '10px',
-    textAlign: 'left',
   },
-  thNum: {
+  linkColumn: {
+    flex: 1,
     color: '#ffffff',
     fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '10px',
-    textAlign: 'center',
-    width: '40px',
   },
-  thPts: {
+  pointsColumn: {
+    flex: 0.5,
     color: '#ffffff',
     fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '10px',
-    textAlign: 'center',
-    width: '60px',
   },
-  thChallenge: {
-    color: '#ffffff',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '10px',
-    textAlign: 'center',
-    width: '80px',
-  },
-  row: {
-    borderBottom: '1px solid #2c4a6d',
-  },
-  td: {
-    color: '#ffffff',
-    fontSize: '13px',
-    padding: '10px',
-  },
-  tdChallenge: {
-    padding: '10px',
-    textAlign: 'center',
+  challengeColumn: {
+    flex: 0.3,
   },
   challengeButton: {
-    width: '30px',
-    height: '30px',
+    width: '45px',
+    height: '45px',
     borderRadius: '50%',
-    border: '2px solid #e67e22',
-    backgroundColor: '#1a3a52',
-    color: '#e67e22',
-    fontSize: '16px',
+    backgroundColor: '#ff6600',
+    color: '#ffffff',
+    fontSize: '22px',
     fontWeight: 'bold',
+    border: 'none',
     cursor: 'pointer',
   },
-  challengeActive: {
-    backgroundColor: '#e67e22',
-    color: '#ffffff',
+  challengedButton: {
+    backgroundColor: '#ff0000',
+    boxShadow: '0 0 20px rgba(255, 0, 0, 0.8)',
   },
-  challengeScreenButton: {
-    width: '100%',
-    padding: '16px',
+  totalRow: {
+    color: '#00ff00',
     fontSize: '18px',
     fontWeight: 'bold',
+    marginTop: '15px',
+    textAlign: 'right',
+  },
+  challengeBottomButton: {
+    width: '100%',
+    padding: '18px',
+    fontSize: '24px',
+    fontWeight: 'bold',
     color: '#ffffff',
-    backgroundColor: '#7dd3c0',
+    backgroundColor: '#ff6600',
     border: 'none',
-    borderRadius: '10px',
+    borderRadius: '12px',
     cursor: 'pointer',
+    boxShadow: '0 4px 15px rgba(255, 102, 0, 0.4)',
+  },
+  disabledButton: {
+    backgroundColor: '#555555',
+    cursor: 'not-allowed',
+    opacity: 0.6,
+    boxShadow: 'none',
   },
 };
 

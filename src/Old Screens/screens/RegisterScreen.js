@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ref, get, set } from 'firebase/database';
 import { database } from '../config/firebase';
-import ScreenFrame from '../components/ScreenFrame';
 
 function RegisterScreen({ onNavigate, role, roomNumber }) {
   const [realName, setRealName] = useState('');
@@ -51,26 +50,31 @@ function RegisterScreen({ onNavigate, role, roomNumber }) {
       playerName: playerName.trim(),
       cellPhone: cellPhone.trim(),
       email: email.trim(),
+      createdAt: new Date().toISOString()
     };
 
-    try {
-      await set(ref(database, `players/${playerId}`), playerData);
+    await set(ref(database, `players/${playerId}`), playerData);
+    localStorage.setItem('currentPlayer', JSON.stringify(playerData));
 
-      if (destination === 'host') {
-        onNavigate('hostroom', { playerId, playerName: playerName.trim(), role, roomNumber });
-      } else if (destination === 'play') {
-        onNavigate('waitingroom', { playerId, playerName: playerName.trim(), role, roomNumber });
-      } else {
-        onNavigate('instructions', { playerId, playerName: playerName.trim(), role, roomNumber });
-      }
-    } catch (error) {
-      alert('Registration failed. Please try again.');
+    if (destination === 'host') {
+      onNavigate('hostroom', { playerId, playerName: playerName.trim() });
+    } else if (destination === 'play') {
+      onNavigate('waiting', { playerId, playerName: playerName.trim(), roomNumber });
+    } else if (destination === 'instructions') {
+      onNavigate('instructions', { playerId, playerName: playerName.trim(), role, roomNumber });
     }
   };
 
   return (
-    <ScreenFrame title="Register">
-      <div style={styles.content}>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        {/* Small Logo Banner */}
+        <div style={styles.banner}>
+          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
+        </div>
+
+        <h2 style={styles.title}>Register</h2>
+
         {/* Your Name */}
         <div style={styles.fieldGroup}>
           <div style={styles.labelRow}>
@@ -82,7 +86,7 @@ function RegisterScreen({ onNavigate, role, roomNumber }) {
               type="text"
               value={realName}
               onChange={(e) => setRealName(e.target.value)}
-              placeholder=""
+              placeholder="Mark Luft"
               style={styles.input}
             />
             <span style={realName.trim() ? styles.checkmark : styles.circle}>
@@ -185,14 +189,45 @@ function RegisterScreen({ onNavigate, role, roomNumber }) {
           </button>
         </div>
       </div>
-    </ScreenFrame>
+    </div>
   );
 }
 
 const styles = {
-  content: {
-    width: '100%',
+  container: {
+    minHeight: '100vh',
+    background: '#1a2332',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  card: {
+    backgroundColor: '#2c4a6d',
+    borderRadius: '20px',
+    border: '3px solid #4a7ba7',
+    padding: '35px',
     maxWidth: '480px',
+    width: '100%',
+    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+  },
+  banner: {
+    backgroundColor: '#8b2d8b',
+    padding: '12px',
+    borderRadius: '10px',
+    marginBottom: '25px',
+    textAlign: 'center',
+  },
+  logo: {
+    maxWidth: '110px',
+    height: 'auto',
+  },
+  title: {
+    color: '#ffffff',
+    fontSize: '32px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: '0 0 30px 0',
   },
   fieldGroup: {
     marginBottom: '20px',

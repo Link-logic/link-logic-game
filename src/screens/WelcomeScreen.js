@@ -19,9 +19,9 @@ function WelcomeScreen({ onNavigate }) {
     <div style={styles.container}>
       <div style={styles.card}>
         {/* Purple Banner */}
-        {/* Large Logo */}
-        <div style={styles.logoContainer}>
-          <img src="/LargeLogo.png" alt="Link Logic" style={styles.largeLogo} />
+        <div style={styles.banner}>
+          <img src="/smalllogo.png" alt="Link Logic" style={styles.logo} />
+          <div style={styles.bannerText}>Link Logic</div>
         </div>
 
         {/* Tagline */}
@@ -84,15 +84,25 @@ const styles = {
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
     width: '450px',
   },
-  logoContainer: {
-    display: 'flex',
-    justifyContent: 'center',
+  banner: {
+    backgroundColor: '#8b2d8b',
+    padding: '15px',
+    borderRadius: '12px',
     marginBottom: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '15px',
   },
-  largeLogo: {
-    width: '100%',
-    maxWidth: '400px',
-    height: 'auto',
+  logo: {
+    width: '60px',
+    height: '60px',
+  },
+  bannerText: {
+    color: '#ffffff',
+    fontSize: '36px',
+    fontWeight: 'bold',
+    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
   },
   tagline: {
     color: '#ffffff',
