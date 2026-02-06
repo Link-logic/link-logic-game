@@ -86,7 +86,7 @@ function RegisterScreen({ onNavigate, role, roomNumber }) {
               type="text"
               value={realName}
               onChange={(e) => setRealName(e.target.value)}
-              placeholder="Mark Luft"
+              placeholder=" "
               style={styles.input}
             />
             <span style={realName.trim() ? styles.checkmark : styles.circle}>
