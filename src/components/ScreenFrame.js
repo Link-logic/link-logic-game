@@ -17,7 +17,7 @@ const ScreenFrame = ({ title, children }) => {
         maxWidth: '700px',
         minHeight: '90vh',
         background: '#000000',
-        border: '6px solid #802EC6',
+        border: '6px solid #9D4EDD',
         borderRadius: '20px',
         display: 'flex',
         flexDirection: 'column',
@@ -32,7 +32,7 @@ const ScreenFrame = ({ title, children }) => {
         <div style={{
           position: 'relative',
           width: '100%',
-          background: '#802EC6',
+          background: '#9D4EDD',
           height: '50px',
           display: 'flex',
           alignItems: 'center',
@@ -40,7 +40,7 @@ const ScreenFrame = ({ title, children }) => {
         }}>
           {/* Logo positioned at left edge of game area */}
           <img 
-            src="/small_logo.jpg" 
+            src="/small_logo.png" 
             alt="Link Logic"
             style={{
               width: '80px',
@@ -74,7 +74,7 @@ const ScreenFrame = ({ title, children }) => {
         <div style={{
           flex: 1,
           margin: '0 20px 20px 20px',
-          border: '6px solid #0066FF',
+          border: '6px solid #3B82F6',
           borderRadius: '12px',
           background: '#000000',
           padding: '30px',
