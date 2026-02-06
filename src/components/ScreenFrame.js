@@ -9,105 +9,86 @@ const ScreenFrame = ({ title, children }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '10px'
+      padding: '20px'
     }}>
-      {/* Outer black border */}
+      {/* Main container with purple border */}
       <div style={{
-        border: '10px solid #000000',
-        background: '#000000',
-        borderRadius: '20px',
         width: '100%',
-        maxWidth: '600px'
+        maxWidth: '700px',
+        minHeight: '90vh',
+        background: '#000000',
+        border: '6px solid #802EC6',
+        borderRadius: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        padding: '0'
       }}>
-        {/* Purple border */}
+        
+        {/* Top space above logo/banner */}
+        <div style={{ height: '40px', background: '#000000' }} />
+
+        {/* Purple banner with logo */}
         <div style={{
-          background: '#000000',
-          border: '8px solid #802EC6',
-          borderRadius: '12px',
-          minHeight: 'calc(100vh - 40px)',
+          position: 'relative',
+          width: '100%',
+          background: '#802EC6',
+          height: '50px',
           display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
+          alignItems: 'center',
+          paddingLeft: '30px'
         }}>
-          
-          {/* Purple banner with logo and title */}
-          <div style={{
-            width: '100%',
-            background: '#802EC6',
-            padding: '6px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '15px',
-            minHeight: '40px',
-            position: 'relative'
-          }}>
-            {/* Logo */}
-            <div style={{
+          {/* Logo positioned at left edge of game area */}
+          <img 
+            src="/small_logo.jpg" 
+            alt="Link Logic"
+            style={{
+              width: '80px',
+              height: '80px',
               position: 'absolute',
-              left: '20px',
-              width: '60px',
-              height: '60px',
-              background: '#ffffff',
-              borderRadius: '8px',
-              padding: '3px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+              left: '30px',
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 10
-            }}>
-              <img 
-                src="/small_logo.jpg" 
-                alt="Link Logic"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-            
-            {/* Title */}
-            <div style={{
-              color: '#ffffff',
-              fontSize: '28px',
-              fontWeight: 'bold',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-              marginLeft: '70px'
-            }}>
-              {title}
-            </div>
-          </div>
-
-          {/* Black space below banner */}
+              borderRadius: '8px',
+              border: '3px solid #ffffff',
+              backgroundColor: '#ffffff'
+            }}
+          />
+          
+          {/* Title */}
           <div style={{
-            height: '30px',
-            background: '#000000'
-          }} />
-
-          {/* Blue-bordered gameplay area */}
-          <div style={{
-            flex: 1,
-            margin: '0 25px 0 25px',
-            border: '5px solid #0066FF',
-            borderRadius: '8px',
-            background: '#000000',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
             color: '#ffffff',
-            minHeight: '400px',
-            overflowY: 'auto'
+            fontSize: '32px',
+            fontWeight: 'bold',
+            marginLeft: '100px',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
           }}>
-            {children}
+            {title}
           </div>
-
         </div>
+
+        {/* Space between banner and blue border */}
+        <div style={{ height: '40px', background: '#000000' }} />
+
+        {/* Blue-bordered game play area */}
+        <div style={{
+          flex: 1,
+          margin: '0 20px 20px 20px',
+          border: '6px solid #0066FF',
+          borderRadius: '12px',
+          background: '#000000',
+          padding: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          color: '#ffffff',
+          minHeight: '500px',
+          overflowY: 'auto'
+        }}>
+          {children}
+        </div>
+
       </div>
     </div>
   );
